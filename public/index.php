@@ -20,32 +20,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	try {
 		if (!isset($_SESSION["token"]) || !isset($_POST["token"]) || $_SESSION["token"] != $_POST["token"]) {
 			// token not present or invalid
-			throw new Exception($language["UNKNOWN_SESSION"]);
+			throw new Exception("UNKNOWN_SESSION");
 		}
 		if (!isset($_POST["username"])) {
-			throw new Exception($language["UNKNOWN_USERNAME"]);
+			throw new Exception("UNKNOWN_USERNAME");
 		}
 		if (strlen($_POST["username"] > 20 || strlen($_POST["username"]) < 3)) {
-			throw new Exception($language["USERNAME_LENGTH_INVALID"]);
+			throw new Exception("USERNAME_LENGTH_INVALID");
 		}
 		if (ctype_alnum($_POST['username']) != true) {
-			throw new Exception($language["USERNAME_NOT_ALNUM"]);
+			throw new Exception("USERNAME_NOT_ALNUM");
 		}
 		if (isset($config["getPasswordOnRegistration"]) && $config["getPasswordOnRegistration"] &&
 			$_POST["password"] != $_POST["password_confirm"]) {
-			throw new Exception($language["PASSWORD_NOT_MATCH"]);
+			throw new Exception("PASSWORD_NOT_MATCH");
 		}
 		if (isset($_POST["note"]) && strlen($_POST["note"]) > 50) {
-			throw new Exception($language["NOTE_LENGTH_EXEEDED"]);
+			throw new Exception("NOTE_LENGTH_EXEEDED");
 		}
 		if (!isset($_POST["email"]) || !filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)) {
-			throw new Exception($language["EMAIL_INVALID_FORMAT"]);
+			throw new Exception("EMAIL_INVALID_FORMAT");
 		}
 		if (isset($_POST["first_name"]) && ! preg_match("/[A-Z][a-z]+/", $_POST["first_name"])) {
-			throw new Exception($language["FIRSTNAME_INVALID_FORMAT"]);
+			throw new Exception("FIRSTNAME_INVALID_FORMAT");
 		}
 		if (isset($_POST["last_name"]) && ! preg_match("/[A-Z][a-z]+/", $_POST["last_name"])) {
-			throw new Exception($language["SIRNAME_INVALID_FORMAT"]);
+			throw new Exception("SIRNAME_INVALID_FORMAT");
 		}
 
 		$first_name = filter_var($_POST["first_name"], FILTER_SANITIZE_STRING);
@@ -87,7 +87,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		print("<title>" . $language["REGISTRATION_REQUEST_FAILED"] . "</title>");
 		print("</head><body>");
 		print("<h1>" . $language["REGISTRATION_REQUEST_FAILED"] . "</h1>");
-		print("<p>" . $e->getMessage() . "</p>");
+		if (isset($language[$e->getMessage()])) {
+			print("<p>" . $language[$e->getMessage()] . "</p>");
+		} else {
+			print("<p>" . $e->getMessage() . "</p>");
+		}
 		print("<a href=\"" . $config["webroot"] . "/index.php" . "\">Zur Registrierungsseite</a>");
 	}
 } else {

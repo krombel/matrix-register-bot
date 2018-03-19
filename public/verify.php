@@ -22,7 +22,7 @@ try {
 		throw new Exception("Method not allowed");
 	}
 	if (!isset($_GET["t"])) {
-		throw new Exception($language["UNKNOWN_TOKEN"]);
+		throw new Exception("UNKNOWN_TOKEN");
 	}
 	$token = filter_var($_GET["t"], FILTER_SANITIZE_STRING);
 
@@ -30,7 +30,7 @@ try {
 
 	$user = $mx_db->getUserForVerify($token);
 	if ($user == NULL) {
-		throw new Exception($language["UNKNOWN_TOKEN"]);
+		throw new Exception("UNKNOWN_TOKEN");
 	}
 	$first_name = $user["first_name"];
 	$last_name = $user["last_name"];
@@ -69,7 +69,11 @@ try {
 	print("<title>" . $language["VERIFICATION_FAILED"] . "</title>");
 	print("</head><body>");
 	print("<h1>" . $language["VERIFICATION_FAILED"] . "</h1>");
-	print("<p>" . $e->getMessage() . "</p>");
+	if (isset($language[$e->getMessage()])) {
+		print("<p>" . $language[$e->getMessage()] . "</p>");
+	} else {
+		print("<p>" . $e->getMessage() . "</p>");
+	}
 	print("<a href=\"" . $config["webroot"] . "/index.php" . "\">Zur Registrierungsseite</a>");
 }
 ?>
