@@ -22,6 +22,8 @@ This is done in several steps:
 - To integrate with matrix-synapse-rest-auth:
   - `/_matrix-internal/identity/v1/check_credentials` should map to `internal/login.php`
 - To integrate with mxisd: Have a look at [the docs](https://github.com/kamax-io/mxisd/blob/master/docs/backends/rest.md) and apply as follows:
+
+
 | Key                            | file which handles that       | Description                                          |
 |--------------------------------|-------------------------------|------------------------------------------------------|
 | rest.endpoints.auth            | internal/login.php            | Validate credentials and get user profile            |
