@@ -172,12 +172,10 @@ class mxDatabase
 	 */
 	function addRegistration($first_name, $last_name, $username, $note, $email) {
 		if ($this->userPendingRegistrations($username)) {
-			require_once("language.php");
-			throw new Exception($language["USERNAME_PENDING_REGISTRATION"]." (requested)");
+			throw new Exception("USERNAME_PENDING_REGISTRATION");
 		}
 		if ($this->userRegistered($username)) {
-			require_once("language.php");
-			throw new Exception($language["USERNAME_REGISTERED"] . " (registered)");
+			throw new Exception("USERNAME_REGISTERED");
 		}
 
 		$verify_token = bin2hex(random_bytes(16));

@@ -22,7 +22,7 @@ try {
 		throw new Exception("Method not allowed");
 	}
 	if (!isset($_GET["t"])) {
-		throw new Exception($language["UNKNOWN_TOKEN"]);
+		throw new Exception("UNKNOWN_TOKEN");
 	}
 	$token = filter_var($_GET["t"], FILTER_SANITIZE_STRING);
 
@@ -42,7 +42,7 @@ try {
 
 	$user = $mx_db->getUserForApproval($token);
 	if ($user == NULL) {
-		throw new Exception($language["UNKNOWN_TOKEN"]);
+		throw new Exception("UNKNOWN_TOKEN");
 	}
 
 	$first_name = $user["first_name"];
@@ -74,7 +74,7 @@ try {
 			$mxMsg->set_type("m.text");
 			$mxMsg->set_body("Fehler beim Registrieren von " . $first_name . " " . $last_name . ".");
 			$mxConn->send($config["register_room"], $mxMsg);
-			throw new Exception($language["REGISTRATION_FAILED"]);
+			throw new Exception("REGISTRATION_FAILED");
 		}
 
 		print("<title>" . $language["ADMIN_VERIFY_SITE_TITLE"] . "</title>");
@@ -160,7 +160,11 @@ background: rgba(255, 255, 255, 0.8);
 	print("<title>" . $language["REGISTRATION_FAILED"] . "</title>");
 	print("</head><body>");
 	print("<h1>" . $language["REGISTRATION_FAILED"] . "</h1>");
-	print("<p>" . $e->getMessage() . "</p>");
+	if (isset($language[$e->getMessage()])) {
+		print("<p>" . $language[$e->getMessage()] . "</p>");
+	} else {
+		print("<p>" . $e->getMessage() . "</p>");
+	}
 	print("<a href=\"" . $config["webroot"] . "/index.php" . "\">Zur Registrierungsseite</a>");
 }
 ?>
