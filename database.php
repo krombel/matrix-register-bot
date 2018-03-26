@@ -306,7 +306,7 @@ class mxDatabase
 
 	function updatePassword($localpart, $old_password, $new_password) {
 		$user = $this->getUserForLogin($localpart, $old_password);
-		if ($user != NULL) {
+		if ($user == NULL) {
 		    throw new Exception ("user with that credentials not found");
 		}
 

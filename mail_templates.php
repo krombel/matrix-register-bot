@@ -81,8 +81,8 @@ Zum Anmelden kannst du folgende Zugangsdaten verwenden:
 Nutzername: $username
 Passwort: $password
 
-Hinweis: Aktuell ist es nicht möglich, das Passwort selbst zu ändern. Sobald die Funktionalität zur
-Verfügung steht, gibt es aber einen Hinweis.
+Hinweis: Das Passwort kannst du aktuell über die App selbst ändern. Auch wenn das Passwort nirgends
+im Klartext gespeichert wird, kann jemand Zugriff auf diese Mail erlangen und so den Zugriff bekommen.
 ";
 /*
 Wichtig: Bitte ändere das Passwort direkt nach der Anmeldung.

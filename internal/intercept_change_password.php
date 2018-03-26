@@ -15,18 +15,16 @@
  */
 
 // URL for this: /_matrix/client/r0/account/password?access_token=$ACCESS_TOKEN
-$response=[
-	"errcode" => "M_UNKNOWN",
-	"error" => "Unknown error while handling password changing",
-];
+
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization');
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-	$response = [];
+	print ("{}");
 	// return with success
 	exit();
 }
+$response= new stdClass;
 try {
 	$inputJSON = file_get_contents('php://input');
 	$input = json_decode($inputJSON, TRUE);
@@ -54,20 +52,21 @@ try {
 	}
 
 	require_once("../database.php");
-	if ($mx_db->updatePassword(
+	if (!$mx_db->updatePassword(
 		$localpart,
 		$input["auth"]["password"],
 		$input["new_password"]
 	)) {
-		$response=[];
-	} else {
 		throw new Exception("invalid credentials or another error while updating");
 	}
 
 } catch (Exception $e) {
 	header("HTTP/1.0 500 Internal Error");
 	error_log("failed with error: " . $e->getMessage());
-	$response["error"] = $e->getMessage();
+	$response = [
+		"errorcode" => "M_UNKNOWN",
+		"error" => $e->getMessage(),
+	];
 }
-print (json_encode($response, JSON_PRETTY_PRINT) . "\n");
+print (json_encode($response, JSON_PRETTY_PRINT));
 ?>
