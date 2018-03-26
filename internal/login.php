@@ -49,9 +49,9 @@ try {
 
     // prefer the localpart attribute of mxisd. But in case of matrix-synapse-rest-auth
     // we have to parse it on our own
-    if (empty($localpart))
+    if (empty($localpart)) {
 	require_once("../helpers.php");
-	$localpart = stripLocalpart($input["auth"]["user"]);
+	$localpart = stripLocalpart($mxid);
     }
 
     if (empty($localpart)) {
