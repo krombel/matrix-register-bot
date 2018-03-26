@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -302,6 +302,24 @@ class mxDatabase
 			return $password;
 		}
 		return NULL;
+	}
+
+	function updatePassword($localpart, $old_password, $new_password) {
+		$user = $this->getUserForLogin($localpart, $old_password);
+		if ($user != NULL) {
+		    throw new Exception ("user with that credentials not found");
+		}
+
+		// The credentials were fine. So now set the new password
+		$password_hash = password_hash($new_password, PASSWORD_BCRYPT, ["cost"=>12]);
+
+		$sql = "UPDATE logins SET password_hash = '" . $password_hash . "'"
+			. "WHERE localpart = '" . $localpart . "'";
+
+		if ($this->db->exec($sql)) {
+			return true;
+		}
+		return false;
 	}
 
 	function searchUserByName($search_term) {

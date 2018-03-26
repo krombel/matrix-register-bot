@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,22 +49,15 @@ try {
 
     // prefer the localpart attribute of mxisd. But in case of matrix-synapse-rest-auth
     // we have to parse it on our own
-    if (empty($localpart) && !empty($mxid)) {
-        // A mxid would start with an @ so we start at the 2. position
-        $sepPos = strpos($mxid,':', 1);
-        if ($sepPos === false) {
-            // : not found. Assume mxid is localpart
-            // TODO: further checks
-            $localpart = $mxid;
-        } else {
-            $localpart = substr($mxid, 1, strpos($mxid,':') - 1 );
-        }
+    if (empty($localpart))
+	require_once("../helpers.php");
+	$localpart = stripLocalpart($input["auth"]["user"]);
     }
-    
+
     if (empty($localpart)) {
         throw new Exception ("localpart cannot be identified");
     }
-    
+
     $password = NULL;
     if (isset($input["user"]) && isset($input["user"]["password"])) {
         $password = $input["user"]["password"];
@@ -103,7 +96,7 @@ try {
             // we do not know how the data shall be transmitted so we do nothing with it
             $response["auth"]["success"] = false;
             break;
-    }    
+    }
 } catch (Exception $e) {
     error_log("Auth failed with error: " . $e->getMessage());
     $response["auth"]["error"] = $e->getMessage();
