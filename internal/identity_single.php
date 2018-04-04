@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2018 Matthias Kesler
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +20,7 @@ try {
     $inputJSON = file_get_contents('php://input');
     $input = json_decode($inputJSON, TRUE);
     if (empty($input)) {
-	    throw new Exception('no valid json as input present');
+        throw new Exception('no valid json as input present');
     }
     if (!isset($input["lookup"])) {
         throw new Exception('"lookup" is not defined');

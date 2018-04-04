@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2018 Matthias Kesler
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,7 @@
  * limitations under the License.
  */
 require_once("../database.php");
-$response=[
+$response = [
     "limited" => false,
     "result" => [],
 ];
@@ -23,7 +24,7 @@ try {
     $inputJSON = file_get_contents('php://input');
     $input = json_decode($inputJSON, TRUE);
     if (empty($input)) {
-	    throw new Exception('no valid json as input present');
+        throw new Exception('no valid json as input present');
     }
     if (!isset($input["by"])) {
         throw new Exception('"by" is not defined');
@@ -41,7 +42,6 @@ try {
         default:
             throw new Exception('unknown type for "by" param');
     }
-    
 } catch (Exception $e) {
     error_log("failed with error: " . $e->getMessage());
     $response["error"] = $e->getMessage();

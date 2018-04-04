@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2018 Matthias Kesler
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +22,7 @@ try {
     $inputJSON = file_get_contents('php://input');
     $input = json_decode($inputJSON, TRUE);
     if (!isset($input)) {
-	throw new Exception('request body is no valid json');
+        throw new Exception('request body is no valid json');
     }
 
     if (!isset($input["lookup"])) {
@@ -43,16 +44,16 @@ try {
                 $res2 = $mx_db->searchUserByEmail($lookup["address"]);
                 if (!empty($res2)) {
                     array_push($response["lookup"], [
-                            "medium" => $lookup["medium"],
-                            "address" => $lookup["address"],
-                            "id" => [
-                                "type" => "localpart",
-                                "value" => $res2[0]["user_id"],
-                            ]
+                        "medium" => $lookup["medium"],
+                        "address" => $lookup["address"],
+                        "id" => [
+                            "type" => "localpart",
+                            "value" => $res2[0]["user_id"],
                         ]
+                            ]
                     );
                 }
-		break;
+                break;
             case "msisdn":
                 // This is reserved for number lookups
                 throw new Exception("unimplemented lookup medium");

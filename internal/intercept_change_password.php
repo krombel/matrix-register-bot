@@ -20,52 +20,50 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization');
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-	print ("{}");
-	// return with success
-	exit();
+    print ("{}");
+    // return with success
+    exit();
 }
 $response = new stdClass;
 try {
-	$inputJSON = file_get_contents('php://input');
-	$input = json_decode($inputJSON, TRUE);
-	if (empty($input)) {
-		throw new Exception('no valid json as input present');
-	}
-	if (!isset($input["auth"])) {
-		throw new Exception('"auth" is not defined');
-	}
-	if (!isset($input["auth"]["user"]) || !isset($input["auth"]["password"])) {
-		throw new Exception('"auth.user" or "auth.password" is not defined');
-	}
-	if (!isset($input["auth"]["type"]) || $input["auth"]["type"] !== "m.login.password") {
-		throw new Exception('no or unknown auth.type');
-	}
-	if (!isset($input["new_password"])) {
-		throw new Exception('"new_password" is not defined');
-	}
+    $inputJSON = file_get_contents('php://input');
+    $input = json_decode($inputJSON, TRUE);
+    if (empty($input)) {
+        throw new Exception('no valid json as input present');
+    }
+    if (!isset($input["auth"])) {
+        throw new Exception('"auth" is not defined');
+    }
+    if (!isset($input["auth"]["user"]) || !isset($input["auth"]["password"])) {
+        throw new Exception('"auth.user" or "auth.password" is not defined');
+    }
+    if (!isset($input["auth"]["type"]) || $input["auth"]["type"] !== "m.login.password") {
+        throw new Exception('no or unknown auth.type');
+    }
+    if (!isset($input["new_password"])) {
+        throw new Exception('"new_password" is not defined');
+    }
 
-	require_once("../helpers.php");
-	$localpart = stripLocalpart($input["auth"]["user"]);
+    require_once("../helpers.php");
+    $localpart = stripLocalpart($input["auth"]["user"]);
 
-	if (empty($localpart)) {
-		throw new Exception("localpart cannot be identified");
-	}
+    if (empty($localpart)) {
+        throw new Exception("localpart cannot be identified");
+    }
 
-	require_once("../database.php");
-	if (!$mx_db->updatePassword(
-		$localpart,
-		$input["auth"]["password"],
-		$input["new_password"]
-	)) {
-		throw new Exception("invalid credentials or another error while updating");
-	}
+    require_once("../database.php");
+    if (!$mx_db->updatePassword(
+                    $localpart, $input["auth"]["password"], $input["new_password"]
+            )) {
+        throw new Exception("invalid credentials or another error while updating");
+    }
 } catch (Exception $e) {
-	header("HTTP/1.0 500 Internal Error");
-	error_log("failed with error: " . $e->getMessage());
-	$response = [
-		"errorcode" => "M_UNKNOWN",
-		"error" => $e->getMessage(),
-	];
+    header("HTTP/1.0 500 Internal Error");
+    error_log("failed with error: " . $e->getMessage());
+    $response = [
+        "errorcode" => "M_UNKNOWN",
+        "error" => $e->getMessage(),
+    ];
 }
 print (json_encode($response, JSON_PRETTY_PRINT));
 ?>

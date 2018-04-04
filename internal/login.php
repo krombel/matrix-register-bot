@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2018 Matthias Kesler
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,11 +21,15 @@ $response = [
 ];
 
 require_once("../database.php");
+
 abstract class LoginRequester {
+
     const UNDEFINED = 0;
     const MXISD = 1;
     const RestAuth = 2;
+
 }
+
 $loginRequester = LoginRequester::UNDEFINED;
 
 try {
@@ -51,12 +56,12 @@ try {
     // prefer the localpart attribute of mxisd. But in case of matrix-synapse-rest-auth
     // we have to parse it on our own
     if (empty($localpart)) {
-	require_once("../helpers.php");
-	$localpart = stripLocalpart($mxid);
+        require_once("../helpers.php");
+        $localpart = stripLocalpart($mxid);
     }
 
     if (empty($localpart)) {
-        throw new Exception ("localpart cannot be identified");
+        throw new Exception("localpart cannot be identified");
     }
 
     $password = NULL;
@@ -64,7 +69,7 @@ try {
         $password = $input["user"]["password"];
     }
     if (empty($password)) {
-        throw new Exception ("password is not present");
+        throw new Exception("password is not present");
     }
 
     $user = $mx_db->getUserForLogin($localpart, $password);
