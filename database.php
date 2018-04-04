@@ -215,7 +215,6 @@ class mxDatabase
 		$sql = "SELECT COUNT(*) FROM registrations WHERE admin_token = '" . $admin_token . "'"
 			. " AND state = " . RegisterState::PendingAdminVerify . " LIMIT 1;";
 		$res = $this->db->query($sql);
-		$first_name = NULL; $last_name = NULL; $username = NULL; $note = NULL; $email = NULL;
 
 		if ($res->fetchColumn() > 0) {
 			$sql = "SELECT first_name, last_name, username, note, email FROM registrations"
@@ -240,7 +239,6 @@ class mxDatabase
 		$sql = "SELECT COUNT(*) FROM registrations WHERE verify_token = '" . $verify_token . "'"
 			. " AND state = " . RegisterState::PendingEmailVerify . " LIMIT 1;";
 		$res = $this->db->query($sql);
-		$first_name = NULL; $last_name = NULL; $username = NULL; $note = NULL; $email = NULL;
 
 		if ($res->fetchColumn() > 0) {
 			$sql = "SELECT first_name, last_name, note, email, admin_token FROM registrations "

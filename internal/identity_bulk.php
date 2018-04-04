@@ -37,7 +37,7 @@ try {
         if (!isset($lookup["address"])) {
             throw new Exception('"lookup.address" is not defined');
         }
-        $res2 = array();
+        $res2 = NULL;
         switch ($lookup["medium"]) {
             case "email":
                 $res2 = $mx_db->searchUserByEmail($lookup["address"]);
@@ -54,9 +54,11 @@ try {
                 }
 		break;
             case "msisdn":
+                // This is reserved for number lookups
+                throw new Exception("unimplemented lookup medium");
                 break;
             default:
-                throw new Exception("unknown type for \"by\" param");
+                throw new Exception("unknown lookup medium");
         }
     }
 } catch (Exception $e) {

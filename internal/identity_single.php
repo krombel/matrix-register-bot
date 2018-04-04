@@ -30,7 +30,7 @@ try {
     if (!isset($input["lookup"]["address"])) {
         throw new Exception('"lookup.address" is not defined');
     }
-    $res2 = array();
+    $res2 = NULL;
     switch ($input["lookup"]["medium"]) {
         case "email":
             $res2 = $mx_db->searchUserByEmail($input["lookup"]["address"]);
@@ -46,15 +46,19 @@ try {
                     ]
                 ];
             }
-            
-
+            break;
+        case "msisdn":
+            // This is reserved for number lookups
+            throw new Exception("unimplemented lookup medium");
             break;
         default:
-            throw new Exception("unknown type for \"by\" param");
+            throw new Exception("unknown lookup medium");
     }
 } catch (Exception $e) {
-    error_log("ídentity_bulk failed with error: " . $e->getMessage());
-    $response["error"] = $e->getMessage();
+    error_log("ídentity_single failed with error: " . $e->getMessage());
+    $response = [
+        "error" => $e->getMessage()
+    ];
 }
 print (json_encode($response, JSON_PRETTY_PRINT) . "\n");
 ?>

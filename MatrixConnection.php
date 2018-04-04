@@ -107,7 +107,6 @@ class MatrixConnection
 
 	function exec_curl_request($handle) {
 		$response = curl_exec($handle);
-
 		if ($response === false) {
 			$errno = curl_errno($handle);
 			$error = curl_error($handle);
@@ -115,7 +114,6 @@ class MatrixConnection
 			curl_close($handle);
 			return false;
 		}
-
 		$http_code = intval(curl_getinfo($handle, CURLINFO_HTTP_CODE));
 		curl_close($handle);
 
@@ -132,7 +130,6 @@ class MatrixConnection
 		} else {
 			$response = json_decode($response, true);
 		}
-
 		return $response;
 	}
 }

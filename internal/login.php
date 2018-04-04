@@ -30,8 +30,7 @@ $loginRequester = LoginRequester::UNDEFINED;
 try {
     $inputJSON = file_get_contents('php://input');
     $input = json_decode($inputJSON, TRUE);
-    $mxid = NULL;
-    $localpart = NULL;
+    $mxid = $localpart = NULL;
     if (isset($input["user"])) {
         if (isset($input["user"]["localpart"])) {
             $localpart = $input["user"]["localpart"];
@@ -45,6 +44,8 @@ try {
             $mxid = $input["user"]["mxid"];
             $loginRequester = LoginRequester::MXISD;
         }
+    } else {
+        throw new Exception('"user" not in request body');
     }
 
     // prefer the localpart attribute of mxisd. But in case of matrix-synapse-rest-auth
@@ -59,7 +60,7 @@ try {
     }
 
     $password = NULL;
-    if (isset($input["user"]) && isset($input["user"]["password"])) {
+    if (isset($input["user"]["password"])) {
         $password = $input["user"]["password"];
     }
     if (empty($password)) {
@@ -95,6 +96,7 @@ try {
             // only return that it was successful.
             // we do not know how the data shall be transmitted so we do nothing with it
             $response["auth"]["success"] = false;
+            $response["auth"]["error"] = "unidentified requester";
             break;
     }
 } catch (Exception $e) {

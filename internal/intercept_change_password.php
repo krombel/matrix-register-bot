@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2018 Matthias Kesler
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 // URL for this: /_matrix/client/r0/account/password?access_token=$ACCESS_TOKEN
 
 header('Access-Control-Allow-Origin: *');
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 	// return with success
 	exit();
 }
-$response= new stdClass;
+$response = new stdClass;
 try {
 	$inputJSON = file_get_contents('php://input');
 	$input = json_decode($inputJSON, TRUE);
@@ -48,7 +48,7 @@ try {
 	$localpart = stripLocalpart($input["auth"]["user"]);
 
 	if (empty($localpart)) {
-		throw new Exception ("localpart cannot be identified");
+		throw new Exception("localpart cannot be identified");
 	}
 
 	require_once("../database.php");
@@ -59,7 +59,6 @@ try {
 	)) {
 		throw new Exception("invalid credentials or another error while updating");
 	}
-
 } catch (Exception $e) {
 	header("HTTP/1.0 500 Internal Error");
 	error_log("failed with error: " . $e->getMessage());

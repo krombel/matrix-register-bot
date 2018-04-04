@@ -39,7 +39,7 @@ try {
             $response["result"] = $mx_db->searchUserByEmail($input["search_term"]);
             break;
         default:
-            throw new Exception("unknown type for \"by\" param");
+            throw new Exception('unknown type for "by" param');
     }
     
 } catch (Exception $e) {
