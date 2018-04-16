@@ -46,6 +46,7 @@ try {
     }
     $first_name = $user["first_name"];
     $last_name = $user["last_name"];
+    $username = $user["username"];
     $note = $user["note"];
     $email = $user["email"];
     $admin_token = $user["admin_token"];
@@ -55,13 +56,13 @@ try {
     $mxConn = new MatrixConnection($config["homeserver"], $config["access_token"]);
     $mxMsg = new MatrixMessage();
     $mxMsg->set_body(strtr($language["MSG_USER_WANTS_REGISTER"], [
-                "@name" => $first_name . ' ' . $last_name,
+                "@name" => (strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username),
                 "@note" => $note,
                 "@adminUrl" => $adminUrl
             ]));
     if (isset($language["MSG_USER_WANTS_REGISTER_FORMATTED"])) {
         $mxMsg->set_formatted_body(strtr($language["MSG_USER_WANTS_REGISTER_FORMATTED"], [
-                "@name" => $first_name . ' ' . $last_name,
+                "@name" => (strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username),
                 "@note" => $note,
                 "@adminUrl" => $adminUrl
             ]));

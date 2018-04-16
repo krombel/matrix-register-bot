@@ -14,7 +14,17 @@ $config = [
     // optional: Do you have a place where howTo's are located? If not leave this value out
     "howToURL" => "https://my-url-for-storing-howTos.net",
 
+    // set the mode of operation. Basically this defines where the data is stored:
+    // - synapse (using the register endpoint - so no further auth config necessary
+    // - local (recommended; using a table in the database to store credentials;
+    //   synapse has to be configured to use that)
+    "operationMode" => "local",
+
+    // This setting is only required for operationMode = synapse
+    "registration_shared_secret" => "SOME_SECRET_KEY_FROM_HOMESERVER_CONFIG"
+
     // When you want to collect the password on registration set this to true
+    // only evaluated when operationMode = local
     "getPasswordOnRegistration" => false,
 
     // default language: one of [ en-gb | de-de ]

@@ -70,11 +70,30 @@ try {
         require_once("../MatrixConnection.php");
         $mxConn = new MatrixConnection($config["homeserver"], $config["access_token"]);
 
-        // generate a password with 8 characters
-        $password = $mx_db->addUser($first_name, $last_name, $username, $email);
+        $password = NULL;
+        switch ($config["operationMode"]) {
+            case "synapse":
+                // register with registration_shared_secret
+                // generate a password with 10 characters
+                $password = bin2hex(openssl_random_pseudo_bytes(5));
+                $res = $mxConn->register($username, $password, $config["registration_shared_secret"]);
+                if (!$res) {
+                    // something went wrong while registering
+                    $password = NULL;
+                }
+                break;
+            case "local":
+                // register by adding a user to the local database
+                $password = $mx_db->addUser($first_name, $last_name, $username, $email);
+                break;
+            default:
+                throw new Exception("Unknown operationMode");
+        }
         if ($password != NULL) {
             // send registration_success
-            $res = send_mail_registration_success($config["homeserver"], $first_name . " " . $last_name, $email, $username, $password, $config["howToURL"]);
+            $res = send_mail_registration_success(
+                    $config["homeserver"], $first_name . " " . $last_name, $email, $username, $password, $config["howToURL"]
+                );
             if ($res) {
                 $mx_db->setRegistrationStateAdmin(RegisterState::AllDone, $token);
             } else {
@@ -84,7 +103,9 @@ try {
             send_mail_registration_allowed_but_failed($config["homeserver"], $first_name . " " . $last_name, $email);
             $mxMsg = new MatrixMessage();
             $mxMsg->set_type("m.text");
-            $mxMsg->set_body(strtr($language["REGISTRATION_FAILED_FOR"], [ "@name" => $first_name . " " . $last_name]));
+            $mxMsg->set_body(strtr($language["REGISTRATION_FAILED_FOR"], [
+                "@name" => strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username,
+            ]));
             $mxConn->send($config["register_room"], $mxMsg);
             throw new Exception("REGISTRATION_FAILED");
         }
@@ -95,7 +116,9 @@ try {
         print("<p>" . $language["ADMIN_REGISTER_ACCEPTED_BODY"] . "</p>");
     } elseif ($action == RegisterState::RegistrationDeclined) {
         $mx_db->setRegistrationStateAdmin(RegisterState::RegistrationDeclined, $token);
-        send_mail_registration_decline($config["homeserver"], $first_name . " " . $last_name, $email, $decline_reason);
+        send_mail_registration_decline(
+                $config["homeserver"], strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username, $email, $decline_reason
+        );
         print("<title>" . $language["ADMIN_VERIFY_SITE_TITLE"] . "</title>");
         print("</head><body>");
         print("<h1>" . $language["ADMIN_VERIFY_SITE_TITLE"] . "</h1>");
@@ -131,21 +154,24 @@ try {
                         </div>
                         <div class="panel-body">
                             <form name="appForm" role="form" action="verify_admin.php" method="GET">
-                                <div class="row">
-                                    <div class="col-xs-6 col-sm-6 col-md-6">
-                                        <div class="form-group">
-                                            <input type="text" id="first_name" class="form-control input-sm"
-                                                   value="<?php echo $first_name; ?>" disabled=true>
+<?php if (isset($config["operationMode"]) && $config["operationMode"] === "local") {
+    // this values will not be used when using the register operation type 
+    ?>
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-6 col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" id="first_name" class="form-control input-sm"
+                                                       value="<?php echo $first_name; ?>" disabled=true>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" id="last_name" class="form-control input-sm"
+                                                       value="<?php echo $last_name; ?>" disabled=true>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-xs-6 col-sm-6 col-md-6">
-                                        <div class="form-group">
-                                            <input type="text" id="last_name" class="form-control input-sm"
-                                                   value="<?php echo $last_name; ?>" disabled=true>
-                                        </div>
-                                    </div>
-                                </div>
-
+<?php } ?>
                                 <div class="form-group">
                                     <input type="text" id="note" class="form-control input-sm" value="<?php echo $note; ?>" disabled=true>
                                 </div>
@@ -157,7 +183,6 @@ try {
                                 <input type="hidden" name="t" id="token" value="<?php echo $token; ?>">
                                 <input type="submit" name="allow" value="<?php echo $language["ACCEPT"]; ?>" class="btn btn-info btn-block">
                                 <input type="submit" name="deny" value="<?php echo $language["DECLINE"]; ?>" class="btn btn-info btn-block">
-
                             </form>
                         </div>
                     </div>

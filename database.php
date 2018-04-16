@@ -241,7 +241,7 @@ class mxDatabase {
         $res = $this->db->query($sql);
 
         if ($res->fetchColumn() > 0) {
-            $sql = "SELECT first_name, last_name, note, email, admin_token FROM registrations "
+            $sql = "SELECT first_name, last_name, note, email, username, admin_token FROM registrations "
                     . " WHERE verify_token = '" . $verify_token . "'"
                     . " AND state = " . RegisterState::PendingEmailVerify . " LIMIT 1;";
             foreach ($this->db->query($sql) as $row) {

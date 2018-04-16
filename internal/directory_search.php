@@ -46,5 +46,5 @@ try {
     error_log("failed with error: " . $e->getMessage());
     $response["error"] = $e->getMessage();
 }
-print (json_encode($response, JSON_PRETTY_PRINT) . "\n");
+print (json_encode($response, JSON_PRETTY_PRINT));
 ?>

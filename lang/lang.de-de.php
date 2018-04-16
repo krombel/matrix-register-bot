@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2018 Matthias Kesler
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,7 +54,8 @@ $language = array(
     "ADMIN_REGISTER_ACCEPTED_BODY" => "Die Registrierungsanfrage wurde akzeptiert. Der Nutzer wurde per Mail informiert.",
     "ADMIN_REGISTER_DECLINED_BODY" => "Die Registrierungsanfrage wurde angelehnt. Der Nutzer wurde per Mail informiert.",
     "JUMP_TO_HOMEPAGE" => "Zur Startseite",
-    "TOPIC_PLEASE_REGISTER" => "Bitte für @homeserver registrieren<small>2-Schritt-Registrierung</small>",
+    "TOPIC_PLEASE_REGISTER" => "Bitte für @homeserver registrieren",
+    "TOPIC_PLEASE_REGISTER_NOTE" => "2-Schritt-Registrierung",
     "NOTE_FOR_REGISTRATION" => "@homeserver ist ein geschlossenes Chat-Netzwerk in dem jeder Nutzer bestätigt werden muss.<br />
         Du bekommst eine E-Mail wenn jemand deine Mitgliedschaft bestätigt hat. An diese wird auch dein initiales Passwort gesendet.
         Hinterlasse also bitte einen Hinweis zu dir (den nur die Administratoren sehen werden).<br />

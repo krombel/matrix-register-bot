@@ -13,6 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// enforce admin via https
+if (!isset($_SERVER['HTTPS'])) {
+    header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], true, 301);
+    exit();
+}
+
 require_once "../language.php";
 if (!file_exists("../config.php")) {
     print($language["NO_CONFIGURATION"]);
@@ -20,12 +26,18 @@ if (!file_exists("../config.php")) {
 }
 require_once "../config.php";
 
-// enforce admin via https
-if (!isset($_SERVER['HTTPS'])) {
-    header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], true, 301);
-    exit();
+// this values will not be used when using the register operation type
+$storeFirstLastName = false;
+if (isset($config["operationMode"]) && $config["operationMode"] === "local") {
+    $storeFirstLastName = true;
 }
 
+// currently the case to store the password on our own is the only supported one
+$storePassword = false;
+if (isset($config["getPasswordOnRegistration"]) && $config["getPasswordOnRegistration"] &&
+        isset($config["operationMode"]) && $config["operationMode"] === "synapse") {
+    $storePassword = true;
+}
 session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -53,17 +65,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (!isset($_POST["email"]) || !filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)) {
             throw new Exception("EMAIL_INVALID_FORMAT");
         }
-        if (isset($_POST["first_name"]) && !preg_match("/[A-Z][a-z]+/", $_POST["first_name"])) {
-            throw new Exception("FIRSTNAME_INVALID_FORMAT");
-        }
-        if (isset($_POST["last_name"]) && !preg_match("/[A-Z][a-z]+/", $_POST["last_name"])) {
-            throw new Exception("SIRNAME_INVALID_FORMAT");
+        if ($storeFirstLastName) {
+            // only require first_name and last_name when we will evaluate them
+            if (!isset($_POST["first_name"]) || !preg_match("/[A-Z][a-z]+/", $_POST["first_name"])) {
+                throw new Exception("FIRSTNAME_INVALID_FORMAT");
+            }
+            if (!isset($_POST["last_name"]) || !preg_match("/[A-Z][a-z]+/", $_POST["last_name"])) {
+                throw new Exception("SIRNAME_INVALID_FORMAT");
+            }
+            $first_name = filter_var($_POST["first_name"], FILTER_SANITIZE_STRING);
+            $last_name = filter_var($_POST["last_name"], FILTER_SANITIZE_STRING);
+        } else {
+            $first_name = $last_name = "";
         }
 
-        $first_name = filter_var($_POST["first_name"], FILTER_SANITIZE_STRING);
-        $last_name = filter_var($_POST["last_name"], FILTER_SANITIZE_STRING);
         $username = filter_var($_POST["username"], FILTER_SANITIZE_STRING);
-        if (isset($_POST["password"])) {
+        if ($storePassword && isset($_POST["password"])) {
             $password = filter_var($_POST["password"], FILTER_SANITIZE_STRING);
         }
         $note = filter_var($_POST["note"], FILTER_SANITIZE_STRING);
@@ -81,7 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $verify_url = $config["webroot"] . "/verify.php?t=" . $verify_token;
         require_once "../mail_templates.php";
         $success = send_mail_pending_verification(
-                $config["homeserver"], $first_name . " " . $last_name, $email, $verify_url);
+                $config["homeserver"], $storeFirstLastName ? $first_name . " " . $last_name : $username, $email, $verify_url);
 
         $mx_db->setRegistrationStateVerify(
                 ($success ? RegisterState::PendingEmailVerify : RegisterState::PendingEmailSend), $verify_token);
@@ -105,7 +122,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 } else {
     $_SESSION["token"] = bin2hex(random_bytes(16));
     ?>
-    <title>Registriere dich für <?php echo $config["homeserver"]; ?></title>
+    <title><?php echo strtr($language["TOPIC_PLEASE_REGISTER"], [ "@homeserver" => $config["homeserver"] ]); ?></title>
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body{
@@ -129,10 +146,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><?php echo strtr($language["TOPIC_PLEASE_REGISTER"], [ "@homeserver" => $config["homeserver"] ]); ?></h3>
+                        <h3 class="panel-title"><?php echo strtr($language["TOPIC_PLEASE_REGISTER"], [ "@homeserver" => $config["homeserver"] ])
+                                . "<small>" . $language["TOPIC_PLEASE_REGISTER_NOTE"] . "</small>"; ?></h3>
                     </div>
                     <div class="panel-body">
                         <form name="regForm" role="form" action="index.php" method="post">
+<?php if ($storeFirstLastName) { ?>
                             <div class="row">
                                 <div class="col-xs-6 col-sm-6 col-md-6">
                                     <div class="form-group">
@@ -147,6 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                 </div>
                             </div>
+<?php } ?>
 
                             <div class="form-group">
                                 <input type="email" name="email" id="email" class="form-control input-sm" placeholder="<?php echo $language["EMAIL_ADDRESS"]; ?>" required>
@@ -160,7 +180,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <input type="text" name="username" id="username" class="form-control input-sm"
                                        placeholder="<?php echo $language["USERNAME"]; ?>" pattern="[a-z1-9]{3,20}" required>
                             </div>
-                            <?php if (isset($config["getPasswordOnRegistration"]) && $config["getPasswordOnRegistration"]) { ?>
+<?php if ($storePassword) { ?>
                                 <div class="row">
                                     <div class="col-xs-6 col-sm-6 col-md-6">
                                         <div class="form-group">
@@ -173,7 +193,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </div>
                                     </div>
                                 </div>
-                            <?php } ?>
+<?php } ?>
                             <input type="hidden" name="token" id="token" value="<?php echo $_SESSION["token"]; ?>">
                             <input type="submit" value="<?php echo $language["REGISTER"]; ?>" class="btn btn-info btn-block">
 
@@ -189,20 +209,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
     <script type="text/javascript">
-        var first_name = document.getElementById("first_name");
-        first_name.oninvalid = function (event) {
-            event.target.setCustomValidity("<?php echo $language["FIRSTNAME_INVALID_FORMAT"]; ?>");
-        }
-        first_name.onkeyup = function (event) {
-            event.target.setCustomValidity("");
-        }
-        var last_name = document.getElementById("last_name");
-        last_name.oninvalid = function (event) {
-            event.target.setCustomValidity("<?php echo $language["SIRNAME_INVALID_FORMAT"]; ?>");
-        }
-        last_name.onkeyup = function (event) {
-            event.target.setCustomValidity("");
-        }
         var user_name = document.getElementById("username");
         user_name.oninvalid = function (event) {
             event.target.setCustomValidity("<?php echo $language["USERNAME_LENGTH_INVALID"]; ?>");
@@ -210,7 +216,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         user_name.onkeyup = function (event) {
             event.target.setCustomValidity("");
         }
-<?php if (isset($config["getPasswordOnRegistration"]) && $config["getPasswordOnRegistration"]) { ?>
+<?php if ($storeFirstLastName) { ?>
+            var first_name = document.getElementById("first_name");
+            first_name.oninvalid = function (event) {
+                event.target.setCustomValidity("<?php echo $language["FIRSTNAME_INVALID_FORMAT"]; ?>");
+            }
+            first_name.onkeyup = function (event) {
+                event.target.setCustomValidity("");
+            }
+            var last_name = document.getElementById("last_name");
+            last_name.oninvalid = function (event) {
+                event.target.setCustomValidity("<?php echo $language["SIRNAME_INVALID_FORMAT"]; ?>");
+            }
+            last_name.onkeyup = function (event) {
+                event.target.setCustomValidity("");
+            }
+<?php } if ($storePassword) { ?>
             var password = document.getElementById("password")
                     , confirm_password = document.getElementById("password_confirm");
             function validatePassword() {
@@ -225,5 +246,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <?php } ?>
     </script>
 <?php } ?>
-    </body>
-</html>
+</body></html>
