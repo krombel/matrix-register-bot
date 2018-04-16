@@ -74,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (!isset($res["verify_token"])) {
             error_log("sth. went wrong. registration did not throw but admin_token not set");
-            throw Exception("Unknown Error");
+            throw Exception("UNKNOWN_ERROR");
         }
         $verify_token = $res["verify_token"];
 
@@ -86,11 +86,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $mx_db->setRegistrationStateVerify(
                 ($success ? RegisterState::PendingEmailVerify : RegisterState::PendingEmailSend), $verify_token);
 
-        print("<title>Erfolgreich</title>");
+        print("<title>" . $language["SUCCESS"] . "</title>");
         print("</head><body>");
-        print("<h1>Erfolgreich</h1>");
-        print("<p>Bitte überprüfe deine E-Mails um deine E-Mail-Adresse zu bestätigen.</p>");
-        print("<a href=\"" . $config["webroot"] . "/index.php" . "\">Zur Registrierungsseite</a>");
+        print("<h1>" . $language["SUCCESS"] . "</h1>");
+        print("<p>" . $language["TASK_CHECK_YOUR_EMAIL_VERIFY"] . "</p>");
+        print("<a href=\"" . $config["webroot"] . "/index.php" . "\">" . $language["JUMP_TO_HOMEPAGE"] . "</a>");
     } catch (Exception $e) {
         print("<title>" . $language["REGISTRATION_REQUEST_FAILED"] . "</title>");
         print("</head><body>");
@@ -100,7 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             print("<p>" . $e->getMessage() . "</p>");
         }
-        print("<a href=\"" . $config["webroot"] . "/index.php" . "\">Zur Registrierungsseite</a>");
+        print("<a href=\"" . $config["webroot"] . "/index.php" . "\">" . $language["JUMP_TO_HOMEPAGE"] . "</a>");
     }
 } else {
     $_SESSION["token"] = bin2hex(random_bytes(16));
@@ -129,7 +129,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Bitte für <?php echo $config["homeserver"]; ?> registrieren<small>2-Schritt-Registrierung</small></h3>
+                        <h3 class="panel-title"><?php echo strtr($language["TOPIC_PLEASE_REGISTER"], [ "@homeserver" => $config["homeserver"] ]); ?></h3>
                     </div>
                     <div class="panel-body">
                         <form name="regForm" role="form" action="index.php" method="post">
@@ -137,53 +137,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <div class="col-xs-6 col-sm-6 col-md-6">
                                     <div class="form-group">
                                         <input type="text" name="first_name" id="first_name" class="form-control input-sm"
-                                               placeholder="Vorname" pattern="[A-Z][a-z]+">
+                                               placeholder="<?php echo $language["FIRST_NAME"]; ?>" pattern="[A-Z][a-z]+">
                                     </div>
                                 </div>
                                 <div class="col-xs-6 col-sm-6 col-md-6">
                                     <div class="form-group">
                                         <input type="text" name="last_name" id="last_name" class="form-control input-sm"
-                                               placeholder="Nachname" pattern="[A-Z][a-z]+">
+                                               placeholder="<?php echo $language["LAST_NAME"]; ?>" pattern="[A-Z][a-z]+">
                                     </div>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <input type="email" name="email" id="email" class="form-control input-sm" placeholder="E-Mail-Adresse" required>
+                                <input type="email" name="email" id="email" class="form-control input-sm" placeholder="<?php echo $language["EMAIL_ADDRESS"]; ?>" required>
                             </div>
 
                             <div class="form-group">
-                                <input type="text" name="note" id="note" class="form-control input-sm" placeholder="Notiz zu dir (max. 50 Zeichen)">
+                                <input type="text" name="note" id="note" class="form-control input-sm" placeholder="<?php echo $language["PLACEHOLDER_NOTE_ABOUT_YOURSELF"]; ?>">
                             </div>
 
                             <div class="form-group">
                                 <input type="text" name="username" id="username" class="form-control input-sm"
-                                       placeholder="Nutzername (für den Login)" pattern="[a-z1-9]{3,20}" required>
+                                       placeholder="<?php echo $language["USERNAME"]; ?>" pattern="[a-z1-9]{3,20}" required>
                             </div>
                             <?php if (isset($config["getPasswordOnRegistration"]) && $config["getPasswordOnRegistration"]) { ?>
                                 <div class="row">
                                     <div class="col-xs-6 col-sm-6 col-md-6">
                                         <div class="form-group">
-                                            <input type="password" name="password" id="password" class="form-control input-sm" placeholder="Passwort" required>
+                                            <input type="password" name="password" id="password" class="form-control input-sm" placeholder="<?php echo $language["PASSWORD"]; ?>" required>
                                         </div>
                                     </div>
                                     <div class="col-xs-6 col-sm-6 col-md-6">
                                         <div class="form-group">
-                                            <input type="password" name="password_confirm" id="password_confirm" class="form-control input-sm" placeholder="Passwort bestätigen" required>
+                                            <input type="password" name="password_confirm" id="password_confirm" class="form-control input-sm" placeholder="<?php echo $language["PASSWORD_CONFIRM"]; ?>" required>
                                         </div>
                                     </div>
                                 </div>
                             <?php } ?>
                             <input type="hidden" name="token" id="token" value="<?php echo $_SESSION["token"]; ?>">
-                            <input type="submit" value="Registrieren" class="btn btn-info btn-block">
+                            <input type="submit" value="<?php echo $language["REGISTER"]; ?>" class="btn btn-info btn-block">
 
                         </form>
-                        <p>Hinweis: <br />
-                            <?php echo $config["homeserver"]; ?> ist ein geschlossenes Chat-Netzwerk in dem jeder Nutzer bestätigt werden muss.<br />
-                            Du bekommst eine E-Mail wenn jemand deine Mitgliedschaft bestätigt hat. An diese wird auch dein initiales Passwort gesendet.
-                            Hinterlasse also bitte einen Hinweis zu dir (der nur den entsprechenden Personen gezeigt wird).<br />
-                            Liebe Grüße vom Team von <?php echo $config["homeserver"]; ?>
-                        </p>
+                        <?php if (isset($language["NOTE_FOR_REGISTRATION"])) {
+                            echo "<p>" .  $language["NOTE"] . ": <br />";
+                            echo strtr($language["NOTE_FOR_REGISTRATION"], [ "@homeserver" => $config["homeserver"] ]);
+                            echo "</p>";
+                        } ?>
                     </div>
                 </div>
             </div>
@@ -192,21 +191,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script type="text/javascript">
         var first_name = document.getElementById("first_name");
         first_name.oninvalid = function (event) {
-            event.target.setCustomValidity("Vorname muss das Format <Großbuchstabe><Kleinbuchstaben> haben");
+            event.target.setCustomValidity("<?php echo $language["FIRSTNAME_INVALID_FORMAT"]; ?>");
         }
         first_name.onkeyup = function (event) {
             event.target.setCustomValidity("");
         }
         var last_name = document.getElementById("last_name");
         last_name.oninvalid = function (event) {
-            event.target.setCustomValidity("Nachname muss das Format <Großbuchstabe><Kleinbuchstaben> haben");
+            event.target.setCustomValidity("<?php echo $language["SIRNAME_INVALID_FORMAT"]; ?>");
         }
         last_name.onkeyup = function (event) {
             event.target.setCustomValidity("");
         }
         var user_name = document.getElementById("username");
         user_name.oninvalid = function (event) {
-            event.target.setCustomValidity("Nutzername darf zwischen 3 und 20 kleine Buchstaben und Zahlen enthalten");
+            event.target.setCustomValidity("<?php echo $language["USERNAME_LENGTH_INVALID"]; ?>");
         }
         user_name.onkeyup = function (event) {
             event.target.setCustomValidity("");
@@ -216,7 +215,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     , confirm_password = document.getElementById("password_confirm");
             function validatePassword() {
                 if (password.value != confirm_password.value) {
-                    confirm_password.setCustomValidity("Passwörter stimmen nicht überein");
+                    confirm_password.setCustomValidity("<?php echo $language["PASSWORD_NOT_MATCH"]; ?>");
                 } else {
                     confirm_password.setCustomValidity('');
                 }

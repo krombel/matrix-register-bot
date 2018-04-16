@@ -84,7 +84,7 @@ try {
             send_mail_registration_allowed_but_failed($config["homeserver"], $first_name . " " . $last_name, $email);
             $mxMsg = new MatrixMessage();
             $mxMsg->set_type("m.text");
-            $mxMsg->set_body("Fehler beim Registrieren von " . $first_name . " " . $last_name . ".");
+            $mxMsg->set_body(strtr($language["REGISTRATION_FAILED_FOR"], [ "@name" => $first_name . " " . $last_name]));
             $mxConn->send($config["register_room"], $mxMsg);
             throw new Exception("REGISTRATION_FAILED");
         }
@@ -155,8 +155,8 @@ try {
                                            value="<?php echo $username; ?>" disabled=true>
                                 </div>
                                 <input type="hidden" name="t" id="token" value="<?php echo $token; ?>">
-                                <input type="submit" name="allow" value="Bestätigen" class="btn btn-info btn-block">
-                                <input type="submit" name="deny" value="Ablehnen" class="btn btn-info btn-block">
+                                <input type="submit" name="allow" value="<?php echo $language["ACCEPT"]; ?>" class="btn btn-info btn-block">
+                                <input type="submit" name="deny" value="<?php echo $language["DECLINE"]; ?>" class="btn btn-info btn-block">
 
                             </form>
                         </div>
@@ -177,7 +177,7 @@ try {
         } else {
             print("<p>" . $e->getMessage() . "</p>");
         }
-        print("<a href=\"" . $config["webroot"] . "/index.php" . "\">Zur Registrierungsseite</a>");
+        print("<a href=\"" . $config["webroot"] . "/index.php" . "\">" . $language["JUMP_TO_HOMEPAGE"] . "</a>");
     }
     ?>
                     < /body>

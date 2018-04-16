@@ -14,7 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-$lang = "de-de";
+require_once("config.php");
+$lang = $config["defaultLanguage"];
+
 if (isset($_GET['lang'])) {
     $lang = filter_var($_GET['lang'], FILTER_SANITIZE_STRING);
 }
@@ -23,6 +25,7 @@ if (!file_exists($lang_file)) {
     error_log("Translation for " . $lang . " not found. Fallback to 'de-de'");
     $lang = "de-de";
 }
+$lang_file = dirname(__FILE__) . "/lang/lang." . $lang . ".php";
 require_once($lang_file);
 unset($lang_file);
 ?>

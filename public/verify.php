@@ -54,12 +54,18 @@ try {
     $adminUrl = $config["webroot"] . "/verify_admin.php?t=" . $admin_token;
     $mxConn = new MatrixConnection($config["homeserver"], $config["access_token"]);
     $mxMsg = new MatrixMessage();
-    $mxMsg->set_body($first_name . ' ' . $last_name . "möchte sich registrieren und hat folgende Notiz hinterlassen:\r\n"
-            . $note . "\r\n"
-            . "Zum Bearbeiten hier klicken:\r\n" . $adminUrl);
-    $mxMsg->set_formatted_body($first_name . ' ' . $last_name . " möchte sich registrieren und hat folgende Notiz hinterlassen:<br />"
-            . $note . "<br />"
-            . "Zum Bearbeiten <a href=\"" . $adminUrl . "\">hier</a> klicken");
+    $mxMsg->set_body(strtr($language["MSG_USER_WANTS_REGISTER"], [
+                "@name" => $first_name . ' ' . $last_name,
+                "@note" => $note,
+                "@adminUrl" => $adminUrl
+            ]));
+    if (isset($language["MSG_USER_WANTS_REGISTER_FORMATTED"])) {
+        $mxMsg->set_formatted_body(strtr($language["MSG_USER_WANTS_REGISTER_FORMATTED"], [
+                "@name" => $first_name . ' ' . $last_name,
+                "@note" => $note,
+                "@adminUrl" => $adminUrl
+            ]));
+    }
     $mxMsg->set_type("m.text");
     $response = $mxConn->send($config["register_room"], $mxMsg);
 
@@ -75,7 +81,7 @@ try {
     print("</head><body>");
     print("<h1>" . $language["VERIFICATION_SUCEEDED"] . "</h1>");
     print("<p>" . $language["VERIFICATION_SUCCESS_BODY"] . "</p>");
-    print("<a href=\"" . $config["webroot"] . "/index.php" . "\">Zur Registrierungsseite</a>");
+    print("<a href=\"" . $config["webroot"] . "/index.php" . "\">" . $language["JUMP_TO_HOMEPAGE"] . "</a>");
 } catch (Exception $e) {
     print("<title>" . $language["VERIFICATION_FAILED"] . "</title>");
     print("</head><body>");
@@ -85,7 +91,7 @@ try {
     } else {
         print("<p>" . $e->getMessage() . "</p>");
     }
-    print("<a href=\"" . $config["webroot"] . "/index.php" . "\">Zur Registrierungsseite</a>");
+    print("<a href=\"" . $config["webroot"] . "/index.php" . "\">" . $language["JUMP_TO_HOMEPAGE"] . "</a>");
 }
 ?>
     </body>
