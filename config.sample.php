@@ -21,7 +21,7 @@ $config = [
     "operationMode" => "local",
 
     // This setting is only required for operationMode = synapse
-    "registration_shared_secret" => "SOME_SECRET_KEY_FROM_HOMESERVER_CONFIG"
+    "registration_shared_secret" => "SOME_SECRET_KEY_FROM_HOMESERVER_CONFIG",
 
     // When you want to collect the password on registration set this to true
     // only evaluated when operationMode = local
