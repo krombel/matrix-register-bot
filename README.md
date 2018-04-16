@@ -45,3 +45,5 @@ Here is an example for nginx:
                 proxy_set_header X-Forwarded-For $remote_addr;
         }
 ```
+## Chat
+For questions, comments, feedback and more regarding this bot come and talk in [#matrix-register-bot:msg-net.de](https://matrix.to/#/#matrix-register-bot:msg-net.de)
