@@ -1,28 +1,34 @@
 # matrix-register-bot
 
-This bot provides a two-step-registration for matrix.
+This bot provides a two-step-registration for matrix ([synapse](https://github.com/matrix-org/synapse)).
 
 This is done in several steps:
-- potential new user registers on a bot-provided side
+- potential new user registers on a bot-provided site
+- user has to verify its mail address
 - bot sends a message to predefined room with a registration notification.
 - users in that room now can approve or decline the registration.
 - When approved
-  - the bot creates credentials
+  - the bot creates short time credentials
   - sends them to the user
-  - stores them encrypted in own database
-  - provides that credentials to [matrix-synapse-rest-auth](https://github.com/kamax-io/matrix-synapse-rest-auth#integrate) which has to be configured to query login.php
+  - stores them encrypted in own databas or uses that as initial password for registration
 
-2nd step: Implement the other apis to integrade [mxisd](https://github.com/kamax-io/mxisd/blob/master/docs/backends/rest.md)
+To configure synapse so that the users can login that were created via this bot you can either 
+- set `operationMode=synapse` so the bot uses the register api to push the new users to synapse or 
+- integrate it via [matrix-synapse-rest-auth](https://github.com/kamax-io/matrix-synapse-rest-auth#integrate) by configuring your system to point at `internal/login.php`.
 
-This bot takes care for user accounts. So it stores the credentials itself and provides ways to access them via matrix-synapse-rest-auth or mxisd.
+When using `operationMode=local` you can have the following benefits (some require [mxisd](https://github.com/kamax-io/mxisd/blob/master/docs/backends/rest.md))
+- Automatically set the display name based on first and last name on first login
+- Use the 3PID lookup for other users (only email)
+- Search for users that you have not seen yet
+
 ## How to install
 
 - Copy `config.sample.php` to `config.php` and configure the bot as you can find there
-- Configure your webserver to publish the folder `public`.
-  The folder `internal` contains files that can be accessed by mxisd or matrix-synapse-rest-auth or else via a reverse proxy
+- Configure your webserver to have the folder `public` accessible via web.
+  The folder `internal` contains files that only provide API access. They can be accessed by mxisd or matrix-synapse-rest-auth 
 - To integrate with [matrix-synapse-rest-auth](https://github.com/kamax-io/matrix-synapse-rest-auth):
   - `/_matrix-internal/identity/v1/check_credentials` should map to `internal/login.php`
-- To integrate with [mxisd](https://github.com/kamax-io/mxisd): Have a look at [the docs](https://github.com/kamax-io/mxisd/blob/master/docs/backends/rest.md) and apply as follows:
+- To integrate with [mxisd](https://github.com/kamax-io/mxisd): Have a look at [the docs of mxisd](https://github.com/kamax-io/mxisd/blob/master/docs/backends/rest.md) and apply as follows:
 
 
 | Key                            | file which handles that       | Description                                          |
@@ -33,17 +39,21 @@ This bot takes care for user accounts. So it stores the credentials itself and p
 | rest.endpoints.identity.bulk   | internal/identity_bulk.php    | Endpoint to query a list of 3PID                     |
 
 
-## Implement usage of additional features:
-### Use the ChangePasswortInterceptor:
+## Further notes:
 
-You need a reverse proxy which maps `/_matrix/client/r0/account/password` to `internal/intercept_change_password.php`.
+### This bot sends mails
+To allow the bot to verify the email address of the user and to interact with them e.g. in case of approval this bot needs a running mailserver configuration.
+This bot relies on php to be properly configured.
+
+### Use the ChangePasswortInterceptor (if `operationMode=local`)
+
+To allow users to change their pasword you need a reverse proxy which maps `/_matrix/client/r0/account/password` to `internal/intercept_change_password.php`.
 Here is an example for nginx:
-
 ```
         location /_matrix/client/r0/account/password {
                 proxy_pass http://localhost/mxbot/internal/intercept_change_password.php;
                 proxy_set_header X-Forwarded-For $remote_addr;
         }
 ```
-## Chat
-For questions, comments, feedback and more regarding this bot come and talk in [#matrix-register-bot:msg-net.de](https://matrix.to/#/#matrix-register-bot:msg-net.de)
+### Chat
+For further questions, comments, feedback and more come and talk in [#matrix-register-bot:msg-net.de](https://matrix.to/#/#matrix-register-bot:msg-net.de)
