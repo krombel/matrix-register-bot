@@ -23,9 +23,7 @@ $sql = "SELECT id, first_name, last_name, username, email, state, note, verify_t
         . "WHERE state = " . RegisterState::PendingEmailSend
         . " OR state = " . RegisterState::PendingAdminSend
         . " OR state = " . RegisterState::PendingRegistration
-        . " OR state = " . RegisterState::PendingSendRegistrationMail
-        . " OR state = " . RegisterState::RegistrationDeclined
-        . " OR state = " . RegisterState::AllDone . ";";
+        . " OR state = " . RegisterState::PendingSendRegistrationMail . ";";
 foreach ($mx_db->query($sql) as $row) {
     $first_name = $row["first_name"];
     $last_name = $row["last_name"];
@@ -102,14 +100,27 @@ foreach ($mx_db->query($sql) as $row) {
             case RegisterState::PendingSendRegistrationMail:
                 print ("Error: Unhandled state: PendingSendRegistrationMail for " . $first_name . " " . $last_name . " (" . $username . ")\n");
                 break;
-            case RegisterState::RegistrationDeclined:
-            case RegisterState::AllDone:
-                // do reqular cleanup
-                break;
         }
     } catch (Exception $e) {
         print("Error while handling cron for " . $first_name . " " . $last_name . " (" . $username . ")\n");
         print($e->getMessage());
     }
+}
+
+try {
+    //cleanup: all finished entries older than one month
+    $mx_db->query("DELETE FROM registrations "
+            . "WHERE request_date < (datetime('now', '-1 month')) "
+            . " AND (state = " . RegisterState::RegistrationDeclined
+            . " OR state = " . RegisterState::AllDone . " );"
+    );
+    //cleanup: all entries which are pending email registration older than two days
+    $mx_db->query("DELETE FROM registrations "
+            . "WHERE request_date < (datetime('now', '-2 days')) "
+            . " AND state = " . RegisterState::PendingEmailVerify . ";"
+    );
+} catch (Exception $ex) {
+    print("Error while database cleanup\n");
+    print($e->getMessage());
 }
 ?>
