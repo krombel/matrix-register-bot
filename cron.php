@@ -74,8 +74,24 @@ foreach ($mx_db->query($sql) as $row) {
                 break;
             case RegisterState::PendingRegistration:
                 // Registration got accepted but registration failed
-
-                $password = $mx_db->addUser($row["first_name"], $row["last_name"], $row["username"], $row["email"]);
+                switch ($config["operationMode"]) {
+                    case "synapse":
+                        // register with registration_shared_secret
+                        // generate a password with 10 characters
+                        $password = bin2hex(openssl_random_pseudo_bytes(5));
+                        $res = $mxConn->register($row["username"], $password, $config["registration_shared_secret"]);
+                        if (!$res) {
+                            // something went wrong while registering
+                            $password = NULL;
+                        }
+                        break;
+                    case "local":
+                        // register by adding a user to the local database
+                        $password = $mx_db->addUser($row["first_name"], $row["last_name"], $row["username"], $row["email"]);
+                        break;
+                    default:
+                        throw new Exception("Unknown operationMode");
+                }
                 if ($password != NULL) {
                     // send registration_success
                     $res = send_mail_registration_success(
