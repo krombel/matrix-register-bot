@@ -20,7 +20,7 @@ $response = [
     ]
 ];
 
-require_once("../database.php");
+require_once(__DIR__ . "/../database.php");
 
 abstract class LoginRequester {
 
@@ -56,7 +56,7 @@ try {
     // prefer the localpart attribute of mxisd. But in case of matrix-synapse-rest-auth
     // we have to parse it on our own
     if (empty($localpart)) {
-        require_once("../helpers.php");
+        require_once(__DIR__ . "/../helpers.php");
         $localpart = stripLocalpart($mxid);
     }
 

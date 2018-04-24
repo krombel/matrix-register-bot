@@ -19,12 +19,12 @@ if (!isset($_SERVER['HTTPS'])) {
     exit();
 }
 
-require_once "../language.php";
+require_once(__DIR__ . "/../language.php");
 if (!file_exists("../config.php")) {
     print($language["NO_CONFIGURATION"]);
     exit();
 }
-require_once "../config.php";
+require_once(__DIR__ . "/../config.php");
 
 // this values will not be used when using the register operation type
 $storeFirstLastName = false;
@@ -86,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $note = filter_var($_POST["note"], FILTER_SANITIZE_STRING);
         $email = filter_var($_POST["email"], FILTER_VALIDATE_EMAIL);
 
-        require_once("../database.php");
+        require_once(__DIR__ . "/../database.php");
         $res = $mx_db->addRegistration($first_name, $last_name, $username, $note, $email);
 
         if (!isset($res["verify_token"])) {
@@ -96,7 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $verify_token = $res["verify_token"];
 
         $verify_url = $config["webroot"] . "/verify.php?t=" . $verify_token;
-        require_once "../mail_templates.php";
+        require_once(__DIR__ . "/../mail_templates.php");
         $success = send_mail_pending_verification(
                 $config["homeserver"], $storeFirstLastName ? $first_name . " " . $last_name : $username, $email, $verify_url);
 

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-require_once "../language.php";
+require_once(__DIR__ . "/../language.php");
 if (!file_exists("../config.php")) {
     print($language["NO_CONFIGURATION"]);
     exit();
 }
-require_once "../config.php";
-require_once "../mail_templates.php";
+require_once(__DIR__ . "/../config.php");
+require_once(__DIR__ . "/../mail_templates.php");
 
 // enforce admin via https
 if (!isset($_SERVER['HTTPS'])) {
@@ -38,7 +38,7 @@ try {
     }
     $token = filter_var($_GET["t"], FILTER_SANITIZE_STRING);
 
-    require_once("../database.php");
+    require_once(__DIR__ . "/../database.php");
 
     $user = $mx_db->getUserForVerify($token);
     if ($user == NULL) {
@@ -51,7 +51,7 @@ try {
     $email = $user["email"];
     $admin_token = $user["admin_token"];
 
-    require_once("../MatrixConnection.php");
+    require_once(__DIR__ . "/../MatrixConnection.php");
     $adminUrl = $config["webroot"] . "/verify_admin.php?t=" . $admin_token;
     $mxConn = new MatrixConnection($config["homeserver"], $config["access_token"]);
     $mxMsg = new MatrixMessage();

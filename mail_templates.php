@@ -14,17 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-require_once("config.php");
+require_once(__DIR__ . "/config.php");
 $lang = $config["defaultLanguage"];
 if (isset($_GET['lang'])) {
     $lang = filter_var($_GET['lang'], FILTER_SANITIZE_STRING);
 }
-$lang_file = dirname(__FILE__) . "/lang/mail." . $lang . ".php";
+$lang_file = __DIR__ . "/lang/mail." . $lang . ".php";
 if (!file_exists($lang_file)) {
     error_log("Mail templates for '" . $lang . "' not found. Fallback to 'de-de'");
     $lang = "de-de";
 }
-$lang_file = dirname(__FILE__) . "/lang/mail." . $lang . ".php";
+$lang_file = __DIR__ . "/lang/mail." . $lang . ".php";
 require_once($lang_file);
 unset($lang_file);
 ?>

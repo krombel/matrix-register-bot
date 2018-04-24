@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 function send_mail($receiver, $subject, $body) {
-	include("../config.php");
+	include(__DIR__ . "/../config.php");
 	$headers = "From: " . $config["register_email"] . "\r\n"
 		. "Content-Type: text/plain;charset=utf-8";
 	return mail($receiver, $subject, $body, $headers);

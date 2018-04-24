@@ -44,14 +44,14 @@ try {
         throw new Exception('"new_password" is not defined');
     }
 
-    require_once("../helpers.php");
+    require_once(__DIR__ . "/../helpers.php");
     $localpart = stripLocalpart($input["auth"]["user"]);
 
     if (empty($localpart)) {
         throw new Exception("localpart cannot be identified");
     }
 
-    require_once("../database.php");
+    require_once(__DIR__ . "/../database.php");
     if (!$mx_db->updatePassword(
                     $localpart, $input["auth"]["password"], $input["new_password"]
             )) {

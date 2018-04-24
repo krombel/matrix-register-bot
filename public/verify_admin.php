@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-require_once "../language.php";
+require_once(__DIR__ . "/../language.php");
 if (!file_exists("../config.php")) {
     print($language["NO_CONFIGURATION"]);
     exit();
 }
-require_once "../config.php";
-require_once "../mail_templates.php";
+require_once(__DIR__ . "/../config.php");
+require_once(__DIR__ . "/../mail_templates.php");
 
 // enforce admin via https
 if (!isset($_SERVER['HTTPS'])) {
@@ -38,7 +38,7 @@ try {
     }
     $token = filter_var($_GET["t"], FILTER_SANITIZE_STRING);
 
-    require_once("../database.php");
+    require_once(__DIR__ . "/../database.php");
 
     $action = NULL;
     if (isset($_GET["allow"])) {
@@ -67,7 +67,7 @@ try {
         $mx_db->setRegistrationStateAdmin(RegisterState::PendingRegistration, $token);
 
         // register user
-        require_once("../MatrixConnection.php");
+        require_once(__DIR__ . "/../MatrixConnection.php");
         $mxConn = new MatrixConnection($config["homeserver"], $config["access_token"]);
 
         $password = NULL;
@@ -205,5 +205,5 @@ try {
         print("<a href=\"" . $config["webroot"] . "/index.php" . "\">" . $language["JUMP_TO_HOMEPAGE"] . "</a>");
     }
     ?>
-                    < /body>
-         </html>
+    </body>
+</html>

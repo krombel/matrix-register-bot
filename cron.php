@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-require_once("config.php");
-require_once("mail_templates.php");
-require_once("database.php");
+require_once(__DIR__ . "/config.php");
+require_once(__DIR__ . "/mail_templates.php");
+require_once(__DIR__ . "/database.php");
 
 $sql = "SELECT id, first_name, last_name, username, email, state, note, verify_token, admin_token FROM registrations "
         . "WHERE state = " . RegisterState::PendingEmailSend
@@ -46,7 +46,7 @@ foreach ($mx_db->query($sql) as $row) {
                 }
                 break;
             case RegisterState::PendingAdminSend:
-                require_once("MatrixConnection.php");
+                require_once(__DIR__ . "/MatrixConnection.php");
                 $adminUrl = $config["webroot"] . "/verify_admin.php?t=" . $row["admin_token"];
                 $mxConn = new MatrixConnection($config["homeserver"], $config["access_token"]);
                 $mxMsg = new MatrixMessage();

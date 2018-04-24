@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-require_once("config.php");
+require_once(__DIR__ . "/config.php");
 if (!isset($config["databaseURI"])) {
     throw new Exception("malformed configuration: databaseURI not defined");
 }

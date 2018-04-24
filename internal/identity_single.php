@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-require_once("../database.php");
+require_once(__DIR__ . "/../database.php");
 $response = new stdClass;
 try {
     $inputJSON = file_get_contents('php://input');
