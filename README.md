@@ -1,4 +1,6 @@
 # matrix-register-bot
+![state: alpha](https://img.shields.io/badge/state-alpha-yellowgreen.svg)
+[![#matrix-register-bot:msg-net.de](https://img.shields.io/badge/matrix-%23matrix--register--bot%3Amsg--net.de-brightgreen.svg)](https://matrix.to/#/#matrix-register-bot:msg-net.de)
 
 This bot provides a two-step-registration for matrix ([synapse](https://github.com/matrix-org/synapse)).
 
@@ -58,6 +60,3 @@ Here is an example for nginx:
 ### The bot postpones some actions
 There is a cron.php which implements retries and database cleanups (e.g. to remove a username claim)
 For this run cron.php regularly with your system of choice.
-
-### Chat
-For further questions, comments, feedback and more come and talk in [#matrix-register-bot:msg-net.de](https://matrix.to/#/#matrix-register-bot:msg-net.de)
