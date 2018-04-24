@@ -54,7 +54,8 @@ $language = array(
     "ADMIN_REGISTER_ACCEPTED_BODY" => "The registration request got accepted. The user got notified per email.",
     "ADMIN_REGISTER_DECLINED_BODY" => "The registration request got declined. The user got notified per email.",
     "JUMP_TO_HOMEPAGE" => "To homepage",
-    "TOPIC_PLEASE_REGISTER" => "Please register for @homeserver<small>2-Step-Registration</small>",
+    "TOPIC_PLEASE_REGISTER" => "Please register for @homeserver",
+    "TOPIC_PLEASE_REGISTER_NOTE" => "2-Step-Registration",
     "NOTE_FOR_REGISTRATION" => "@homeserver is a closed chat network where every user has to be confirmed.<br />
         You will get an email once sb. approved your registration. An initial password will be send to you afterwards.
         Please leave a note about yourself (that will only be shown to the admins).<br />
