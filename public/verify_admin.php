@@ -93,7 +93,7 @@ try {
             // send registration_success
             $res = send_mail_registration_success(
                     $config["homeserver"], $first_name . " " . $last_name, $email, $username, $password, $config["howToURL"]
-                );
+            );
             if ($res) {
                 $mx_db->setRegistrationStateAdmin(RegisterState::AllDone, $token);
             } else {
@@ -154,9 +154,10 @@ try {
                         </div>
                         <div class="panel-body">
                             <form name="appForm" role="form" action="verify_admin.php" method="GET">
-<?php if (isset($config["operationMode"]) && $config["operationMode"] === "local") {
-    // this values will not be used when using the register operation type 
-    ?>
+                                <?php
+                                if (isset($config["operationMode"]) && $config["operationMode"] === "local") {
+                                    // this values will not be used when using the register operation type
+                                    ?>
                                     <div class="row">
                                         <div class="col-xs-6 col-sm-6 col-md-6">
                                             <div class="form-group">
@@ -171,7 +172,7 @@ try {
                                             </div>
                                         </div>
                                     </div>
-<?php } ?>
+                                <?php } ?>
                                 <div class="form-group">
                                     <input type="text" id="note" class="form-control input-sm" value="<?php echo $note; ?>" disabled=true>
                                 </div>

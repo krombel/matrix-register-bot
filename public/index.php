@@ -122,7 +122,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 } else {
     $_SESSION["token"] = bin2hex(random_bytes(16));
     ?>
-    <title><?php echo strtr($language["TOPIC_PLEASE_REGISTER"], [ "@homeserver" => $config["homeserver"] ]); ?></title>
+    <title><?php echo strtr($language["TOPIC_PLEASE_REGISTER"], ["@homeserver" => $config["homeserver"]]); ?></title>
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body{
@@ -146,27 +146,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><?php echo strtr($language["TOPIC_PLEASE_REGISTER"], [ "@homeserver" => $config["homeserver"] ])
-                                . "<small>" . $language["TOPIC_PLEASE_REGISTER_NOTE"] . "</small>"; ?></h3>
+                        <h3 class="panel-title"><?php
+                            echo strtr($language["TOPIC_PLEASE_REGISTER"], ["@homeserver" => $config["homeserver"]])
+                            . "<small>" . $language["TOPIC_PLEASE_REGISTER_NOTE"] . "</small>";
+                            ?></h3>
                     </div>
                     <div class="panel-body">
                         <form name="regForm" role="form" action="index.php" method="post">
-<?php if ($storeFirstLastName) { ?>
-                            <div class="row">
-                                <div class="col-xs-6 col-sm-6 col-md-6">
-                                    <div class="form-group">
-                                        <input type="text" name="first_name" id="first_name" class="form-control input-sm"
-                                               placeholder="<?php echo $language["FIRST_NAME"]; ?>" pattern="[A-Z][a-z]+">
+                            <?php if ($storeFirstLastName) { ?>
+                                <div class="row">
+                                    <div class="col-xs-6 col-sm-6 col-md-6">
+                                        <div class="form-group">
+                                            <input type="text" name="first_name" id="first_name" class="form-control input-sm"
+                                                   placeholder="<?php echo $language["FIRST_NAME"]; ?>" pattern="[A-Z][a-z]+">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6 col-sm-6 col-md-6">
+                                        <div class="form-group">
+                                            <input type="text" name="last_name" id="last_name" class="form-control input-sm"
+                                                   placeholder="<?php echo $language["LAST_NAME"]; ?>" pattern="[A-Z][a-z]+">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-xs-6 col-sm-6 col-md-6">
-                                    <div class="form-group">
-                                        <input type="text" name="last_name" id="last_name" class="form-control input-sm"
-                                               placeholder="<?php echo $language["LAST_NAME"]; ?>" pattern="[A-Z][a-z]+">
-                                    </div>
-                                </div>
-                            </div>
-<?php } ?>
+                            <?php } ?>
 
                             <div class="form-group">
                                 <input type="email" name="email" id="email" class="form-control input-sm" placeholder="<?php echo $language["EMAIL_ADDRESS"]; ?>" required>
@@ -180,7 +182,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <input type="text" name="username" id="username" class="form-control input-sm"
                                        placeholder="<?php echo $language["USERNAME"]; ?>" pattern="[a-z1-9]{3,20}" required>
                             </div>
-<?php if ($storePassword) { ?>
+                            <?php if ($storePassword) { ?>
                                 <div class="row">
                                     <div class="col-xs-6 col-sm-6 col-md-6">
                                         <div class="form-group">
@@ -193,16 +195,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </div>
                                     </div>
                                 </div>
-<?php } ?>
+                            <?php } ?>
                             <input type="hidden" name="token" id="token" value="<?php echo $_SESSION["token"]; ?>">
                             <input type="submit" value="<?php echo $language["REGISTER"]; ?>" class="btn btn-info btn-block">
 
                         </form>
-                        <?php if (isset($language["NOTE_FOR_REGISTRATION"])) {
-                            echo "<p>" .  $language["NOTE"] . ": <br />";
-                            echo strtr($language["NOTE_FOR_REGISTRATION"], [ "@homeserver" => $config["homeserver"] ]);
+                        <?php
+                        if (isset($language["NOTE_FOR_REGISTRATION"])) {
+                            echo "<p>" . $language["NOTE"] . ": <br />";
+                            echo strtr($language["NOTE_FOR_REGISTRATION"], ["@homeserver" => $config["homeserver"]]);
                             echo "</p>";
-                        } ?>
+                        }
+                        ?>
                     </div>
                 </div>
             </div>

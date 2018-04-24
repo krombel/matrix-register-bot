@@ -56,16 +56,16 @@ try {
     $mxConn = new MatrixConnection($config["homeserver"], $config["access_token"]);
     $mxMsg = new MatrixMessage();
     $mxMsg->set_body(strtr($language["MSG_USER_WANTS_REGISTER"], [
-                "@name" => (strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username),
-                "@note" => $note,
-                "@adminUrl" => $adminUrl
-            ]));
+        "@name" => (strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username),
+        "@note" => $note,
+        "@adminUrl" => $adminUrl
+    ]));
     if (isset($language["MSG_USER_WANTS_REGISTER_FORMATTED"])) {
         $mxMsg->set_formatted_body(strtr($language["MSG_USER_WANTS_REGISTER_FORMATTED"], [
-                "@name" => (strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username),
-                "@note" => $note,
-                "@adminUrl" => $adminUrl
-            ]));
+            "@name" => (strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username),
+            "@note" => $note,
+            "@adminUrl" => $adminUrl
+        ]));
     }
     $mxMsg->set_type("m.text");
     $response = $mxConn->send($config["register_room"], $mxMsg);
