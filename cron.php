@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 require_once(__DIR__ . "/config.php");
+require_once(__DIR__ . "/language.php");
 require_once(__DIR__ . "/mail_templates.php");
 require_once(__DIR__ . "/database.php");
 
@@ -50,12 +51,18 @@ foreach ($mx_db->query($sql) as $row) {
                 $adminUrl = $config["webroot"] . "/verify_admin.php?t=" . $row["admin_token"];
                 $mxConn = new MatrixConnection($config["homeserver"], $config["access_token"]);
                 $mxMsg = new MatrixMessage();
-                $mxMsg->set_body($first_name . ' ' . $last_name . " möchte sich registrieren und hat folgende Notiz hinterlassen:\r\n"
-                        . $row["note"] . "\r\n"
-                        . "Zum Bearbeiten hier klicken:\r\n" . $adminUrl);
-                $mxMsg->set_formatted_body($first_name . ' ' . $last_name . " möchte sich registrieren und hat folgende Notiz hinterlassen:<br />"
-                        . $row["note"] . "<br />"
-                        . "Zum Bearbeiten <a href=\"" . $adminUrl . "\">hier</a> klicken");
+                $mxMsg->set_body(strtr($language["MSG_USER_WANTS_REGISTER"], [
+                    "@name" => (strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username),
+                    "@note" => $note,
+                    "@adminUrl" => $adminUrl
+                ]));
+                if (isset($language["MSG_USER_WANTS_REGISTER_FORMATTED"])) {
+                    $mxMsg->set_formatted_body(strtr($language["MSG_USER_WANTS_REGISTER_FORMATTED"], [
+                        "@name" => (strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username),
+                        "@note" => $note,
+                        "@adminUrl" => $adminUrl
+                    ]));
+                }
                 $mxMsg->set_type("m.text");
                 $response = $mxConn->send($config["register_room"], $mxMsg);
 
@@ -73,7 +80,9 @@ foreach ($mx_db->query($sql) as $row) {
                 $password = $mx_db->addUser($row["first_name"], $row["last_name"], $row["username"], $row["email"]);
                 if ($password != NULL) {
                     // send registration_success
-                    $res = send_mail_registration_success($config["homeserver"], $first_name . " " . $last_name, $email, $username, $password, $config["howToURL"]);
+                    $res = send_mail_registration_success(
+                            $config["homeserver"], strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username, $email, $username, $password, $config["howToURL"]
+                    );
                     if ($res) {
                         $mx_db->setRegistrationStateById(RegisterState::AllDone, $row["id"]);
                     } else {
@@ -83,7 +92,9 @@ foreach ($mx_db->query($sql) as $row) {
                     send_mail_registration_allowed_but_failed($config["homeserver"], $first_name . " " . $last_name, $email);
                     $mxMsg = new MatrixMessage();
                     $mxMsg->set_type("m.text");
-                    $mxMsg->set_body("Fehler beim Registrieren von " . $first_name . " " . $last_name . ".");
+                    $mxMsg->set_body(strtr($language["REGISTRATION_FAILED_FOR"], [
+                        "@name" => strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username,
+                    ]));
                     $mxConn->send($config["register_room"], $mxMsg);
                     throw new Exception($language["REGISTRATION_FAILED"]);
                 }
