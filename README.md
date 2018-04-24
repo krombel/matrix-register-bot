@@ -55,5 +55,9 @@ Here is an example for nginx:
                 proxy_set_header X-Forwarded-For $remote_addr;
         }
 ```
+### The bot postpones some actions
+There is a cron.php which implements retries and database cleanups (e.g. to remove a username claim)
+For this run cron.php regularly with your system of choice.
+
 ### Chat
 For further questions, comments, feedback and more come and talk in [#matrix-register-bot:msg-net.de](https://matrix.to/#/#matrix-register-bot:msg-net.de)
