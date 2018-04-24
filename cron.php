@@ -125,17 +125,19 @@ foreach ($mx_db->query($sql) as $row) {
 
 try {
     //cleanup: all finished entries older than one month
+    $timestamp = date('Y-m-d H:m:s',strtotime("-1 month"));
     $mx_db->query("DELETE FROM registrations "
-            . "WHERE request_date < (datetime('now', '-1 month')) "
+            . "WHERE request_date < '$timestamp'"
             . " AND (state = " . RegisterState::RegistrationDeclined
             . " OR state = " . RegisterState::AllDone . " );"
     );
     //cleanup: all entries which are pending email registration older than two days
+    $timestamp = date('Y-m-d H:m:s',strtotime("-2 days"));
     $mx_db->query("DELETE FROM registrations "
-            . "WHERE request_date < (datetime('now', '-2 days')) "
+            . "WHERE request_date < '$timestamp'"
             . " AND state = " . RegisterState::PendingEmailVerify . ";"
     );
-} catch (Exception $ex) {
+} catch (Exception $e) {
     print("Error while database cleanup\n");
     print($e->getMessage());
 }
