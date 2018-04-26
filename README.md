@@ -18,7 +18,7 @@ To configure synapse so that the users can login that were created via this bot 
 - set `operationMode=synapse` so the bot uses the register api to push the new users to synapse or 
 - integrate it via [matrix-synapse-rest-auth](https://github.com/kamax-io/matrix-synapse-rest-auth#integrate) by configuring your system to point at `internal/login.php`.
 
-When using `operationMode=local` you can have the following benefits (some require [mxisd](https://github.com/kamax-io/mxisd/blob/master/docs/backends/rest.md))
+When using `operationMode=local` you can have the following benefits (some require [mxisd](https://github.com/kamax-io/mxisd/blob/master/docs/stores/rest.md))
 - Automatically set the display name based on first and last name on first login
 - Use the 3PID lookup for other users (only email)
 - Search for users that you have not seen yet
@@ -30,7 +30,7 @@ When using `operationMode=local` you can have the following benefits (some requi
   The folder `internal` contains files that only provide API access. They can be accessed by mxisd or matrix-synapse-rest-auth 
 - To integrate with [matrix-synapse-rest-auth](https://github.com/kamax-io/matrix-synapse-rest-auth):
   - `/_matrix-internal/identity/v1/check_credentials` should map to `internal/login.php`
-- To integrate with [mxisd](https://github.com/kamax-io/mxisd): Have a look at [the docs of mxisd](https://github.com/kamax-io/mxisd/blob/master/docs/backends/rest.md) and apply as follows:
+- To integrate with [mxisd](https://github.com/kamax-io/mxisd): Have a look at [the docs of mxisd](https://github.com/kamax-io/mxisd/blob/master/docs/stores/rest.md) and apply as follows:
 
 
 | Key                            | file which handles that       | Description                                          |
