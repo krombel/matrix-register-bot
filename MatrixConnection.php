@@ -103,7 +103,15 @@ class MatrixConnection {
         curl_setopt($handle, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
         curl_setopt($handle, CURLOPT_POSTFIELDS, json_encode($data));
 
-        return $this->exec_curl_request($handle);
+        try {
+            return $this->exec_curl_request($handle);
+        } catch (Exception $e) {
+            if (strcmp("AUTHENTICATION_FAILED", $e->getMessage()) == 0) {
+                throw new Exception("WRONG_REGISTRATION_SHARED_SECRET");
+            } else {
+                throw $e;
+            }
+        }
     }
 
     function exec_curl_request($handle) {
@@ -126,7 +134,7 @@ class MatrixConnection {
             $response = json_decode($response, true);
             error_log("Request has failed with error {$response['error']}\n");
             if ($http_code == 401) {
-                throw new Exception('Invalid access token provided');
+                throw new Exception("AUTHENTICATION_FAILED");
             }
         } else {
             $response = json_decode($response, true);
