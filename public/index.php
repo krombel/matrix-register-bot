@@ -49,8 +49,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (!isset($_POST["username"])) {
             throw new Exception("UNKNOWN_USERNAME");
         }
-        if (strlen($_POST["username"] > 20 || strlen($_POST["username"]) < 3)) {
-            throw new Exception("USERNAME_LENGTH_INVALID");
+        if (strlen($_POST["username"]) > 20 ||
+                strlen($_POST["username"]) < 3 ||
+                !ctype_lower($_POST["username"])) {
+            throw new Exception("USERNAME_INVALID");
         }
         if (ctype_alnum($_POST['username']) != true) {
             throw new Exception("USERNAME_NOT_ALNUM");
@@ -215,7 +217,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script type="text/javascript">
         var user_name = document.getElementById("username");
         user_name.oninvalid = function (event) {
-            event.target.setCustomValidity("<?php echo $language["USERNAME_LENGTH_INVALID"]; ?>");
+            event.target.setCustomValidity("<?php echo $language["USERNAME_INVALID"]; ?>");
         }
         user_name.onkeyup = function (event) {
             event.target.setCustomValidity("");
