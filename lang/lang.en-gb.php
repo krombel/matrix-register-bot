@@ -37,6 +37,7 @@ $language = array(
     "USERNAME_NOT_ALNUM" => "Username is not alphanumeric",
     "USERNAME_PENDING_REGISTRATION" => "This username is locked for registration. Try again later or try again with a different username",
     "USERNAME_REGISTERED" => "This username is already registered. Please try again with another username",
+    "PASSWORD_NOT_PROVIDED" => "One or both passwords are not provided",
     "PASSWORD_NOT_MATCH" => "passwords do not match",
     "NOTE_LENGTH_EXEEDED" => "Note consists of more than 50 characters",
     "PLACEHOLDER_NOTE_ABOUT_YOURSELF" => "Note about yourself (max. 50 characters)",

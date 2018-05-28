@@ -37,6 +37,7 @@ $language = array(
     "USERNAME_NOT_ALNUM" => "Nutzername ist nicht alphanumerisch",
     "USERNAME_PENDING_REGISTRATION" => "Dieser Nutzername wurde bereits zur Registrierung vorgemerkt. Versuche es später noch einmal oder wähle einen anderen Nutzernamen",
     "USERNAME_REGISTERED" => "Dieser Nutzername wurde bereits registriert. Bitte wähle einen anderen Nutzernamen",
+    "PASSWORD_NOT_PROVIDED" => "Ein oder beide Passwörter wurden nicht gesetzt",
     "PASSWORD_NOT_MATCH" => "Passwörter stimmen nicht überein",
     "NOTE_LENGTH_EXEEDED" => "Notiz ist länger als die erlaubten 50 Zeichen",
     "PLACEHOLDER_NOTE_ABOUT_YOURSELF" => "Notiz zu dir (max. 50 Zeichen)",

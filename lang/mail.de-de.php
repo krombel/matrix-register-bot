@@ -79,7 +79,7 @@ Deine Registrierungsanfrage wurde durch die Administratoren bestätigt.
 
 Zum Anmelden kannst du folgende Zugangsdaten verwenden:
 Nutzername: $username
-Passwort: $password
+Passwort: " . (empty($password) ? "wie selbst gesetzt": $password) . "
 
 Hinweis: Das Passwort kannst du aktuell über die App selbst ändern. Auch wenn das Passwort nirgends
 im Klartext gespeichert wird, kann jemand Zugriff auf diese Mail erlangen und so den Zugriff bekommen.

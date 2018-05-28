@@ -71,11 +71,17 @@ try {
         $mxConn = new MatrixConnection($config["homeserver"], $config["access_token"]);
 
         $password = NULL;
+        $use_db_password = (isset($config["getPasswordOnRegistration"]) && $config["getPasswordOnRegistration"]);
+        if ($use_db_password && isset($user["password"]) && strlen($user["password"]) > 0) {
+            $password = $user["password"];
+        } else {
+            $use_db_password = false;
+            // generate a password with 10 characters
+            $password = bin2hex(openssl_random_pseudo_bytes(5));
+        }
         switch ($config["operationMode"]) {
             case "synapse":
                 // register with registration_shared_secret
-                // generate a password with 10 characters
-                $password = bin2hex(openssl_random_pseudo_bytes(5));
                 $res = $mxConn->register($username, $password, $config["registration_shared_secret"]);
                 if (!$res) {
                     // something went wrong while registering
@@ -84,7 +90,7 @@ try {
                 break;
             case "local":
                 // register by adding a user to the local database
-                $password = $mx_db->addUser($first_name, $last_name, $username, $email);
+                $password = $mx_db->addUser($first_name, $last_name, $username, $password, $email);
                 break;
             default:
                 throw new Exception("Unknown operationMode");
@@ -92,7 +98,13 @@ try {
         if ($password != NULL) {
             // send registration_success
             $res = send_mail_registration_success(
-                    $config["homeserver"], $first_name . " " . $last_name, $email, $username, $password, $config["howToURL"]
+                    $config["homeserver"],
+                    $first_name . " " . $last_name,
+                    $email,
+                    $username,
+                    // only send password when auto-created
+                    ($use_db_password ? NULL : $password),
+                    $config["howToURL"]
             );
             if ($res) {
                 $mx_db->setRegistrationStateAdmin(RegisterState::AllDone, $token);

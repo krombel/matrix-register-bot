@@ -78,7 +78,7 @@ Your registration request got verified by the admin team.
 
 To log in you can use the following credentials::
 Username: $username
-Password: $password
+Passwort: " . (empty($password) ? "as self-set": $password) . "
 
 Important: Please change your password as soon as possible after your first login.
 The password is not stored in clear text on the server but people could get access to this mail

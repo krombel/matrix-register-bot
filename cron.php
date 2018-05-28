@@ -19,7 +19,9 @@ require_once(__DIR__ . "/language.php");
 require_once(__DIR__ . "/mail_templates.php");
 require_once(__DIR__ . "/database.php");
 
-$sql = "SELECT id, first_name, last_name, username, email, state, note, verify_token, admin_token FROM registrations "
+$sql = "SELECT id, first_name, last_name, username, password, email,"
+        . " state, note, verify_token, admin_token "
+        . "FROM registrations "
         . "WHERE state = " . RegisterState::PendingEmailSend
         . " OR state = " . RegisterState::PendingAdminSend
         . " OR state = " . RegisterState::PendingRegistration
@@ -87,7 +89,7 @@ foreach ($mx_db->query($sql) as $row) {
                         break;
                     case "local":
                         // register by adding a user to the local database
-                        $password = $mx_db->addUser($row["first_name"], $row["last_name"], $row["username"], $row["email"]);
+                        $password = $mx_db->addUser($row["first_name"], $row["last_name"], $row["username"], $row["password"], $row["email"]);
                         break;
                     default:
                         throw new Exception("Unknown operationMode");

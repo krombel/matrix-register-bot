@@ -23,6 +23,15 @@ When using `operationMode=local` you can have the following benefits (some requi
 - Use the 3PID lookup for other users (only email)
 - Search for users that you have not seen yet
 
+## Requirements
+
+- Working PHP environment with
+  - database connection provider \[one of sqlite, mysql, postgres\]
+  - curl extension to notify admins and register users (in `operationMode=synapse`)
+  - mail capability to interact with the users (Verification, Approval (+ initial password), Notifications)
+- matrix-synapse-rest-auth when using `operationMode=local`
+- some PHP capable webserver which makes the folder `public` accessible to the public and propably `internal` for server-internal access
+
 ## How to install
 
 - Copy `config.sample.php` to `config.php` and configure the bot as you can find there
@@ -43,9 +52,11 @@ When using `operationMode=local` you can have the following benefits (some requi
 
 ## Further notes:
 
-### This bot sends mails
-To allow the bot to verify the email address of the user and to interact with them e.g. in case of approval this bot needs a running mailserver configuration.
-This bot relies on php to be properly configured.
+### Security: Passwords from registration form are stored in clear text
+Currently the passwords which are typed in while capturing the register request are stored in clear text.
+The bot needs to access them to trigger a register request with correct credentials.
+It is currently strongly recommended to set `"getPasswordOnRegistration" => false` in your config!
+This leads to autocreating passwords which will then be send to the users directly without storing it.
 
 ### Use the ChangePasswortInterceptor (if `operationMode=local`)
 

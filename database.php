@@ -78,7 +78,7 @@ class mxDatabase {
 			first_name TEXT,
 			last_name TEXT,
 			username TEXT,
-			password_hash TEXT DEFAULT '',
+			password TEXT DEFAULT '',
 			note TEXT,
 			email TEXT,
 			verify_token TEXT,
@@ -98,7 +98,7 @@ class mxDatabase {
 			)");
         // make sure the bot is allowed to login
         if (!$this->userRegistered("register_bot")) {
-            $password = $this->addUser("Register", "Bot", "register_bot", $config["register_email"]);
+            $password = $this->addUser("Register", "Bot", "register_bot", NULL, $config["register_email"]);
             $config["register_password"] = $password;
             $myfile = fopen(dirname(__FILE__) . "/config.json", "w");
             fwrite($myfile, json_encode($config, JSON_PRETTY_PRINT));
@@ -184,7 +184,7 @@ class mxDatabase {
      *
      * @return ["verify_token"]
      */
-    function addRegistration($first_name, $last_name, $username, $note, $email) {
+    function addRegistration($first_name, $last_name, $username, $password, $note, $email) {
         if ($this->userPendingRegistrations($username)) {
             throw new Exception("USERNAME_PENDING_REGISTRATION");
         }
@@ -196,8 +196,9 @@ class mxDatabase {
         $admin_token = bin2hex(random_bytes(16));
 
         $this->db->exec("INSERT INTO registrations
-			(first_name, last_name, username, note, email, verify_token, admin_token)
-			VALUES ('" . $first_name . "','" . $last_name . "','" . $username . "','" . $note . "','"
+                (first_name, last_name, username, password, note, email, verify_token, admin_token)
+		VALUES ('" . $first_name . "','" . $last_name . "','"
+                . $username . "','" . $password . "','" . $note . "','"
                 . $email . "','" . $verify_token . "','" . $admin_token . "')");
 
         return [
@@ -217,7 +218,7 @@ class mxDatabase {
         $res = $this->db->query($sql);
 
         if ($res->fetchColumn() > 0) {
-            $sql = "SELECT first_name, last_name, username, note, email FROM registrations"
+            $sql = "SELECT first_name, last_name, username, password, note, email FROM registrations"
                     . " WHERE admin_token = '" . $admin_token . "'"
                     . " AND state = " . RegisterState::PendingAdminVerify
                     . " LIMIT 1;";
@@ -282,14 +283,16 @@ class mxDatabase {
      * 			NULL when failed
      *
      */
-    function addUser($first_name, $last_name, $username, $email) {
+    function addUser($first_name, $last_name, $username, $password, $email) {
         // check if user already exists and abort in that case
         if ($this->userRegistered($username)) {
             return NULL;
         }
 
-        // generate a password with 10 characters
-        $password = bin2hex(openssl_random_pseudo_bytes(5));
+        if ($password == NULL) {
+            // generate a password with 10 characters
+            $password = bin2hex(openssl_random_pseudo_bytes(5));
+        }
         $password_hash = password_hash($password, PASSWORD_BCRYPT, ["cost" => 12]);
 
         $sql = "INSERT INTO logins (first_name, last_name, localpart, password_hash, email) VALUES "

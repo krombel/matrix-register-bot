@@ -57,8 +57,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (ctype_alnum($_POST['username']) != true) {
             throw new Exception("USERNAME_NOT_ALNUM");
         }
-        if (isset($config["getPasswordOnRegistration"]) && $config["getPasswordOnRegistration"] &&
-                $_POST["password"] != $_POST["password_confirm"]) {
+        if ($storePassword && (!isset($_POST["password"]) || !isset($_POST["password_confirm"]))) {
+                throw new Exception("PASSWORD_NOT_PROVIDED");
+        }
+        if ($storePassword && $_POST["password"] != $_POST["password_confirm"]) {
             throw new Exception("PASSWORD_NOT_MATCH");
         }
         if (isset($_POST["note"]) && strlen($_POST["note"]) > 50) {
@@ -82,6 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         $username = filter_var($_POST["username"], FILTER_SANITIZE_STRING);
+        $password = "";
         if ($storePassword && isset($_POST["password"])) {
             $password = filter_var($_POST["password"], FILTER_SANITIZE_STRING);
         }
@@ -89,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $email = filter_var($_POST["email"], FILTER_VALIDATE_EMAIL);
 
         require_once(__DIR__ . "/../database.php");
-        $res = $mx_db->addRegistration($first_name, $last_name, $username, $note, $email);
+        $res = $mx_db->addRegistration($first_name, $last_name, $username, $password, $note, $email);
 
         if (!isset($res["verify_token"])) {
             error_log("sth. went wrong. registration did not throw but admin_token not set");
