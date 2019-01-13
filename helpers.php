@@ -30,4 +30,13 @@ function stripLocalpart($mxid) {
     return $localpart;
 }
 
+function getCurlHandle($url) {
+    $handle = curl_init($url);
+    curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($handle, CURLOPT_TIMEOUT, 60);
+    curl_setopt($handle, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
+    return $handle;
+}
+
 ?>

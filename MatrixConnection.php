@@ -14,6 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+require_once(__DIR__ . "/helpers.php");
+
 class MatrixConnection {
 
     private $hs;
@@ -45,12 +48,8 @@ class MatrixConnection {
 
         $url = "https://" . $this->hs . "/_matrix/client/r0/rooms/"
                 . urlencode($room_id) . "/send/m.room.message?access_token=" . $this->at;
-        $handle = curl_init($url);
-        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
-        curl_setopt($handle, CURLOPT_TIMEOUT, 60);
+        $handle = getCurlHandle($url);
         curl_setopt($handle, CURLOPT_POSTFIELDS, json_encode($send_message));
-        curl_setopt($handle, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
 
         $response = $this->exec_curl_request($handle);
         return isset($response["event_id"]);
@@ -70,11 +69,7 @@ class MatrixConnection {
         }
 
         $url = "https://" . $this->hs . "/_matrix/client/r0/profile/@" . $username . ":" . $this->hs;
-        $handle = curl_init($url);
-        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
-        curl_setopt($handle, CURLOPT_TIMEOUT, 60);
-        curl_setopt($handle, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
+        $handle = getCurlHandle($url);
 
         $res = $this->exec_curl_request($handle);
         return !(isset($res["errcode"]) && $res["errcode"] == "M_UNKNOWN");
@@ -85,7 +80,7 @@ class MatrixConnection {
             error_log("no username provided");
         }
         if (!$password) {
-            error_log("no message to send");
+            error_log("no password provided");
         }
 
         $mac = hash_hmac('sha1', $username, $shared_secret);
@@ -96,11 +91,7 @@ class MatrixConnection {
             "mac" => $mac,
         );
         $url = "https://" . $this->hs . "/_matrix/client/v2_alpha/register";
-        $handle = curl_init($url);
-        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
-        curl_setopt($handle, CURLOPT_TIMEOUT, 60);
-        curl_setopt($handle, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
+        $handle = getCurlHandle($url);
         curl_setopt($handle, CURLOPT_POSTFIELDS, json_encode($data));
 
         try {
@@ -172,7 +163,6 @@ class MatrixMessage {
     function get_object() {
         return $this->message;
     }
-
 }
 
 ?>
