@@ -75,6 +75,25 @@ class MatrixConnection {
         return !(isset($res["errcode"]) && $res["errcode"] == "M_UNKNOWN");
     }
 
+    function getRegisterNonce() {
+        $url = "https://" . $this->hs . "/_matrix/client/r0/admin/register";
+        $handle = getCurlHandle($url);
+
+        try {
+            $response = $this->exec_curl_request($handle);
+            if (is_array($response) && isset($response["nonce"])) {
+                return $response["nonce"];
+            }
+            throw new Exception("INVALID_RESPONSE_FROM_SERVER");
+        } catch (Exception $e) {
+            if (strcmp("AUTHENTICATION_FAILED", $e->getMessage()) == 0) {
+                throw new Exception("WRONG_REGISTRATION_SHARED_SECRET");
+            } else {
+                throw $e;
+            }
+        }
+    }
+
     function register($username, $password, $shared_secret) {
         if (!$username) {
             error_log("no username provided");
@@ -82,15 +101,18 @@ class MatrixConnection {
         if (!$password) {
             error_log("no password provided");
         }
-
-        $mac = hash_hmac('sha1', $username, $shared_secret);
+        $nonce = $this->getRegisterNonce();
+        //TODO allow registering of admin.
+        $hmac_content = $nonce . "\x00" . $username . "\x00" . $password . "\x00notadmin";
+        $mac = hash_hmac('sha1', $hmac_content, $shared_secret);
 
         $data = array(
+            "nonce" => $nonce,
             "username" => $username,
             "password" => $password,
             "mac" => $mac,
         );
-        $url = "https://" . $this->hs . "/_matrix/client/v2_alpha/register";
+        $url = "https://" . $this->hs . "/_matrix/client/r0/admin/register";
         $handle = getCurlHandle($url);
         curl_setopt($handle, CURLOPT_POSTFIELDS, json_encode($data));
 
