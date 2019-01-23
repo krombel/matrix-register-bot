@@ -60,6 +60,9 @@ try {
     $first_name = $user["first_name"];
     $last_name = $user["last_name"];
     $username = $user["username"];
+    // we have 2 cases: first and last name or just the username
+    $call_name = strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username;
+
     $note = $user["note"];
     $email = $user["email"];
 
@@ -99,7 +102,7 @@ try {
             // send registration_success
             $res = send_mail_registration_success(
                     $config["homeserver"],
-                    $first_name . " " . $last_name,
+                    $call_name,
                     $email,
                     $username,
                     // only send password when auto-created
@@ -112,11 +115,11 @@ try {
                 $mx_db->setRegistrationStateAdmin(RegisterState::PendingSendRegistrationMail, $token);
             }
         } else {
-            send_mail_registration_allowed_but_failed($config["homeserver"], $first_name . " " . $last_name, $email);
+            send_mail_registration_allowed_but_failed($config["homeserver"], $call_name, $email);
             $mxMsg = new MatrixMessage();
             $mxMsg->set_type("m.text");
             $mxMsg->set_body(strtr($language["REGISTRATION_FAILED_FOR"], [
-                "@name" => strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username,
+                "@name" => $call_name,
             ]));
             $mxConn->send($config["register_room"], $mxMsg);
             throw new Exception("REGISTRATION_FAILED");
@@ -129,7 +132,7 @@ try {
     } elseif ($action == RegisterState::RegistrationDeclined) {
         $mx_db->setRegistrationStateAdmin(RegisterState::RegistrationDeclined, $token);
         send_mail_registration_decline(
-                $config["homeserver"], strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username, $email, $decline_reason
+                $config["homeserver"], $call_name, $email, $decline_reason
         );
         print("<title>" . $language["ADMIN_VERIFY_SITE_TITLE"] . "</title>");
         print("</head><body>");

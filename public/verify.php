@@ -51,18 +51,21 @@ try {
     $email = $user["email"];
     $admin_token = $user["admin_token"];
 
+    // we have 2 cases: first and last name or just the username
+    $call_name = strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username;
+
     require_once(__DIR__ . "/../MatrixConnection.php");
     $adminUrl = $config["webroot"] . "/verify_admin.php?t=" . $admin_token;
     $mxConn = new MatrixConnection($config["homeserver"], $config["access_token"]);
     $mxMsg = new MatrixMessage();
     $mxMsg->set_body(strtr($language["MSG_USER_WANTS_REGISTER"], [
-        "@name" => (strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username),
+        "@name" => $call_name,
         "@note" => $note,
         "@adminUrl" => $adminUrl
     ]));
     if (isset($language["MSG_USER_WANTS_REGISTER_FORMATTED"])) {
         $mxMsg->set_formatted_body(strtr($language["MSG_USER_WANTS_REGISTER_FORMATTED"], [
-            "@name" => (strlen($first_name . $last_name) > 0 ? $first_name . " " . $last_name : $username),
+            "@name" => $call_name,
             "@note" => $note,
             "@adminUrl" => $adminUrl
         ]));
@@ -76,7 +79,7 @@ try {
     $mx_db->setRegistrationStateVerify(
             ($response ? RegisterState::PendingAdminVerify : RegisterState::PendingAdminSend), $token);
 
-    send_mail_pending_approval($config["homeserver"], $first_name . " " . $last_name, $email);
+    send_mail_pending_approval($config["homeserver"], $call_name, $email);
 
     print("<title>" . $language["VERIFICATION_SUCEEDED"] . "</title>");
     print("</head><body>");

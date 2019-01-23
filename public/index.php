@@ -20,7 +20,7 @@ if (!isset($_SERVER['HTTPS'])) {
 }
 
 require_once(__DIR__ . "/../language.php");
-if (!file_exists("../config.php")) {
+if (!file_exists(__DIR__ . "/../config.php")) {
     print($language["NO_CONFIGURATION"]);
     exit();
 }
