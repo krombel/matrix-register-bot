@@ -46,16 +46,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // token not present or invalid
             throw new Exception("UNKNOWN_SESSION");
         }
-        if (!isset($_POST["username"])) {
+        $username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_STRING);
+        if (empty($username)) {
             throw new Exception("UNKNOWN_USERNAME");
         }
-        if (strlen($_POST["username"]) > 20 ||
-                strlen($_POST["username"]) < 3 ||
-                !ctype_lower($_POST["username"])) {
+        if (strlen($username) > 20 ||
+                strlen($username) < 3) {
             throw new Exception("USERNAME_INVALID");
         }
-        if (ctype_alnum($_POST['username']) != true) {
+        if (!ctype_alnum($username)) {
             throw new Exception("USERNAME_NOT_ALNUM");
+        }
+        if (!strcmp($username, strtolower($username))) {
+            throw new Exception("USERNAME_INVALID");
         }
         if ($storePassword && (!isset($_POST["password"]) || !isset($_POST["password_confirm"]))) {
                 throw new Exception("PASSWORD_NOT_PROVIDED");
@@ -83,7 +86,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $first_name = $last_name = "";
         }
 
-        $username = filter_var($_POST["username"], FILTER_SANITIZE_STRING);
         $password = "";
         if ($storePassword && isset($_POST["password"])) {
             $password = filter_var($_POST["password"], FILTER_SANITIZE_STRING);
