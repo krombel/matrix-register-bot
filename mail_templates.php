@@ -35,14 +35,16 @@ function send_mail($receiver, $subject, $body) {
             $mail->isSMTP();                                  // Set mailer to use SMTP
             $mail->Host = $smtp_conf["host"];                 // Specify main and backup SMTP servers
             $mail->Port = $smtp_conf["port"];                 // TCP port to connect to
-            if (isset($smtp_conf["user"])) {
+            if (!empty($smtp_conf["user"])) {
                 $mail->SMTPAuth = true;                       // Enable SMTP authentication
                 $mail->Username = $smtp_conf["user"];         // SMTP username
-                if (isset($smtp_conf["password"])) {
+                if (!empty($smtp_conf["password"])) {
                     $mail->Password = $smtp_conf["password"]; // SMTP password
                 }
             }
-            $mail->SMTPSecure = 'tls';                        // Enable TLS encryption, `ssl` also accepted
+            if (!empty($smtp_conf["encryption"])) {
+                $mail->SMTPSecure = $smtp_conf["encryption"]; // Enable TLS encryption, `ssl` also accepted
+            }
         } else {
             // fallback to sendmail functionality (as before)
             $mail->isSendmail();
