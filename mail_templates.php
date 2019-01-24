@@ -28,7 +28,6 @@ function send_mail($receiver, $subject, $body) {
     $mail = new PHPMailer(true);
     try {
         $mail->CharSet = 'utf-8';                             // Enable utf-8 support for umlauts
-        $mail->SMTPDebug = 2;                                 // Enable verbose debug output
 
         if (is_array($config["smtp"])) {
             $smtp_conf = $config["smtp"];
