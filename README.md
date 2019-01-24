@@ -14,29 +14,39 @@ This is done in several steps:
   - sends them to the user
   - stores them encrypted in own databas or uses that as initial password for registration
 
-To configure synapse so that the users can login that were created via this bot you can either 
-- set `operationMode=synapse` so the bot uses the register api to push the new users to synapse or 
-- integrate it via [matrix-synapse-rest-auth](https://github.com/kamax-io/matrix-synapse-rest-auth#integrate) by configuring your system to point at `internal/login.php`.
-
-When using `operationMode=local` you can have the following benefits (some require [mxisd](https://github.com/kamax-io/mxisd/blob/master/docs/stores/rest.md))
-- Automatically set the display name based on first and last name on first login
-- Use the 3PID lookup for other users (only email)
-- Search for users that you have not seen yet
+There are two operation modes available:
+- `operationMode=synapse`
+    - No adjustments on your running environment are required. This bot uses the the [Shared-Secret Registration of synapse](https://github.com/matrix-org/synapse/blob/master/docs/admin_api/register_api.rst) to register the users.
+- `operationMode=local`:
+    - Bot handles user management. Therefore it stores the user-data and uses [matrix-synapse-rest-auth](https://github.com/kamax-io/matrix-synapse-rest-auth#integrate) to authenticate the users.
+    - This way it is possible to set the display name of a user on first login (first- and lastname instead of username)
+    - The email address of the user can be used to implement third party lookup (requires [mxisd](https://github.com/kamax-io/mxisd/blob/master/docs/stores/rest.md))
+    - search for users you have not seen yet but are available on the server
 
 ## Requirements
 
 - Working PHP environment with
   - database connection provider \[one of sqlite, mysql, postgres\]
-  - curl extension to notify admins and register users (in `operationMode=synapse`)
-  - mail capability to interact with the users (Verification, Approval (+ initial password), Notifications)
-- matrix-synapse-rest-auth when using `operationMode=local`
-- some PHP capable webserver which makes the folder `public` accessible to the public and propably `internal` for server-internal access
+  - curl extension
+  - mail capability to interact with the users (verification, approval (+ initial password), notifications)
+      - either via sendmail or with credentials
+- [composer](https://getcomposer.org) installed
+- [matrix-synapse-rest-auth](https://github.com/kamax-io/matrix-synapse-rest-auth) when using `operationMode=local`
 
 ## How to install
 
-- Copy `config.sample.php` to `config.php` and configure the bot as you can find there
+```
+git clone https://github.com/krombel/matrix-register-bot
+cd matrix-register-bot
+composer install
+cp config.sample.php config.php
+editor config.php
+```
 - Configure your webserver to have the folder `public` accessible via web.
-  The folder `internal` contains files that only provide API access. They can be accessed by mxisd or matrix-synapse-rest-auth 
+
+
+When running `operationMode=local`:
+- Configure your webserver to provide the folder `internal` internally. This is only meant to be accessible by mxisd and matrix-synapse-rest-auth 
 - To integrate with [matrix-synapse-rest-auth](https://github.com/kamax-io/matrix-synapse-rest-auth):
   - `/_matrix-internal/identity/v1/check_credentials` should map to `internal/login.php`
 - To integrate with [mxisd](https://github.com/kamax-io/mxisd): Have a look at [the docs of mxisd](https://github.com/kamax-io/mxisd/blob/master/docs/stores/rest.md) and apply as follows:
@@ -71,3 +81,4 @@ Here is an example for nginx:
 ### The bot postpones some actions
 There is a cron.php which implements retries and database cleanups (e.g. to remove a username claim)
 For this run cron.php regularly with your system of choice.
+A suggested interval is once per day
