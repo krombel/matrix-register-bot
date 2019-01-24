@@ -50,14 +50,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (empty($username)) {
             throw new Exception("UNKNOWN_USERNAME");
         }
-        if (strlen($username) > 20 ||
-                strlen($username) < 3) {
+        if (strlen($username) > 20 || strlen($username) < 3) {
             throw new Exception("USERNAME_INVALID");
         }
         if (!ctype_alnum($username)) {
             throw new Exception("USERNAME_NOT_ALNUM");
         }
-        if (!strcmp($username, strtolower($username))) {
+        if (strcmp($username, strtolower($username)) !== 0) {
             throw new Exception("USERNAME_INVALID");
         }
         if ($storePassword && (!isset($_POST["password"]) || !isset($_POST["password_confirm"]))) {
