@@ -1,0 +1,15 @@
+{
+    "name": "krombel/matrix-register-bot",
+    "description": "Register-Bot which implements a 2-factor registration for synapse servers to take part on matrix-communication",
+    "type": "project",
+    "require": {
+        "phpmailer/phpmailer": "^6.0"
+    },
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Krombel",
+            "email": "krombel@krombel.de"
+        }
+    ]
+}
