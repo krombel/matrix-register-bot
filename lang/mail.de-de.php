@@ -14,13 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function send_mail($receiver, $subject, $body) {
-    include(__DIR__ . "/../config.php");
-    $headers = "From: " . $config["register_email"] . "\r\n"
-            . "Content-Type: text/plain;charset=utf-8";
-    return mail($receiver, $subject, $body, $headers);
-}
-
 function send_mail_pending_verification($homeserver, $user, $receiver, $verify_url) {
     $subject = "Bitte bestätige Registrierung auf $homeserver";
     $body = "Guten Tag " . $user . ",

@@ -15,6 +15,54 @@
  * limitations under the License.
  */
 require_once(__DIR__ . "/config.php");
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+require_once(__DIR__ . "/vendor/autoload.php");
+
+// standard mail implementation
+function send_mail($receiver, $subject, $body) {
+    // somehow $config is not available when called again => reinit here
+    include(__DIR__ . "/config.php");
+
+    $mail = new PHPMailer(true);
+    try {
+        $mail->CharSet = 'utf-8';                             // Enable utf-8 support for umlauts
+
+        if (is_array($config["smtp"])) {
+            $smtp_conf = $config["smtp"];
+            $mail->isSMTP();                                  // Set mailer to use SMTP
+            $mail->Host = $smtp_conf["host"];                 // Specify main and backup SMTP servers
+            $mail->Port = $smtp_conf["port"];                 // TCP port to connect to
+            if (!empty($smtp_conf["user"])) {
+                $mail->SMTPAuth = true;                       // Enable SMTP authentication
+                $mail->Username = $smtp_conf["user"];         // SMTP username
+                if (!empty($smtp_conf["password"])) {
+                    $mail->Password = $smtp_conf["password"]; // SMTP password
+                }
+            }
+            if (!empty($smtp_conf["encryption"])) {
+                $mail->SMTPSecure = $smtp_conf["encryption"]; // Enable TLS encryption, `ssl` also accepted
+            }
+        } else {
+            // fallback to sendmail functionality (as before)
+            $mail->isSendmail();
+        }
+
+        //Recipients
+        $mail->setFrom($config["register_email"], 'Register Service');
+        $mail->addAddress($receiver);
+        $mail->Subject = $subject;
+        $mail->Body    = $body;
+
+        $mail->send();
+        return True;
+    } catch (Exception $e) {
+        error_log('Message could not be sent. Mailer Error: ' . $mail->ErrorInfo);
+        return False;
+    }
+}
+
 $lang = $config["defaultLanguage"];
 if (isset($_GET['lang'])) {
     $lang = filter_var($_GET['lang'], FILTER_SANITIZE_STRING);

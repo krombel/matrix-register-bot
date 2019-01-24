@@ -1,2 +1,5 @@
 config.php
 db_file.sqlite
+
+# do not track sources which will be built by composer
+/vendor/

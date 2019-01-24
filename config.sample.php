@@ -5,6 +5,18 @@ $config = [
 
     // Which e-mail-adresse shall the bot use to send e-mails?
     "register_email" => 'register_bot@example.com',
+
+    // which settings should be used to send via SMTP Gateway?
+    "smtp" => [
+        "host" => "localhost",
+        "port" => "25",
+        // use authentication?
+        "user" => "register@example.com",
+        "password" => "SecretEMailPassword",
+        // Use some encryption to SMTP-Server? [ssl, tls] or unset
+        "encryption" => False
+    ],
+
     // Where should the bot post registration requests to?
     "register_room" => '$registerRoomID:example.com',
 
