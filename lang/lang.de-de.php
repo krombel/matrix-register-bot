@@ -17,6 +17,9 @@
 $language = array(
     "ACCEPT" => "Akzeptieren",
     "DECLINE" => "Ablehnen",
+    "DECLINE_REASON" => "Grund für die Ablehnung",
+    "SUBMIT" => "Abschicken",
+    "MAKE_A_SELECTION" => "Treffe eine Auswahl",
     "SUCCESS" => "Erfolgreich",
     "FIRST_NAME" => "Vorname",
     "LAST_NAME" => "Nachname",

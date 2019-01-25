@@ -33,23 +33,19 @@ try {
     if ($_SERVER["REQUEST_METHOD"] != "GET") {
         throw new Exception("Method not allowed");
     }
-    if (!isset($_GET["t"])) {
+    $token = filter_input(INPUT_GET, "t", FILTER_SANITIZE_STRING);
+    if (empty($token)) {
         throw new Exception("UNKNOWN_TOKEN");
     }
-    $token = filter_var($_GET["t"], FILTER_SANITIZE_STRING);
 
     require_once(__DIR__ . "/../database.php");
 
-    $action = NULL;
-    if (isset($_GET["allow"])) {
+    $param_action = filter_input(INPUT_GET, "d", FILTER_SANITIZE_STRING);
+    if ($param_action == "allow") {
         $action = RegisterState::RegistrationAccepted;
-    }
-    $decline_reason = NULL;
-    if (isset($_GET["deny"])) {
+    } elseif ($param_action == "deny") {
         $action = RegisterState::RegistrationDeclined;
-        if (isset($_GET["reason"])) {
-            $decline_reason = filter_var($_GET["reason"], FILTER_SANITIZE_STRING);
-        }
+        $decline_reason = filter_input(INPUT_GET, "decline_reason", FILTER_SANITIZE_STRING);
     }
 
     $user = $mx_db->getUserForApproval($token);
@@ -139,7 +135,6 @@ try {
         print("<h1>" . $language["ADMIN_VERIFY_SITE_TITLE"] . "</h1>");
         print("<p>" . $language["ADMIN_REGISTER_DECLINED_BODY"] . "</p>");
     } else {
-
         print("<title>" . $language["ADMIN_VERIFY_SITE_TITLE"] . "</title>");
         ?>
         <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet">
@@ -168,7 +163,7 @@ try {
                             <h3 class="panel-title"><?php echo $language["ADMIN_VERIFY_SITE_TITLE"]; ?></h3>
                         </div>
                         <div class="panel-body">
-                            <form name="appForm" role="form" action="verify_admin.php" method="GET">
+                            <form name="appForm" role="form" onsubmit="return submitForm()" action="verify_admin.php" method="GET">
                                 <?php
                                 if (isset($config["operationMode"]) && $config["operationMode"] === "local") {
                                     // this values will not be used when using the register operation type
@@ -196,9 +191,16 @@ try {
                                     <input type="text" id="username" class="form-control input-sm"
                                            value="<?php echo $username; ?>" disabled=true>
                                 </div>
+                                <div class="form-group">
+                                    <input type="hidden" name="decline_reason" class="form-control input-sm"
+                                           placeholder="<?php echo $language["DECLINE_REASON"]; ?>">
+                                </div>
                                 <input type="hidden" name="t" id="token" value="<?php echo $token; ?>">
-                                <input type="submit" name="allow" value="<?php echo $language["ACCEPT"]; ?>" class="btn btn-info btn-block">
-                                <input type="submit" name="deny" value="<?php echo $language["DECLINE"]; ?>" class="btn btn-info btn-block">
+                                <div class="form-group">
+                                    <input type="radio" name="d" value="allow"><?php echo $language["ACCEPT"]; ?>
+                                    <input type="radio" name="d" value="deny"><?php echo $language["DECLINE"]; ?>
+                                </div>
+                                <input type="submit" value="<?php echo $language["SUBMIT"]; ?>" class="btn btn-info btn-block">
                             </form>
                         </div>
                     </div>
@@ -206,7 +208,30 @@ try {
             </div>
         </div>
         <script type="text/javascript">
-
+            var rad = document.appForm.d;
+            function isSelected() {
+                for (var i=0; i<rad.length; i++)
+                    if (rad[i].checked)
+                        return true;
+                return false;
+            }
+            function submitForm() {
+                if (isSelected()) {
+                    return true;
+                }
+                alert("<?php echo $language["MAKE_A_SELECTION"];?>");
+                return false;
+            }
+            for(var i = 0; i < rad.length; i++) {
+                rad[i].onclick = function() {
+                    if (this.value === "deny") {
+                        document.appForm.decline_reason.type = "text";
+                    } else {
+                        document.appForm.decline_reason.type = "hidden";
+                    }
+                };
+            }
+        </script>
             <?php
         } // else - no action provided
     } catch (Exception $e) {

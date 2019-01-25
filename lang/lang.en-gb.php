@@ -17,6 +17,9 @@
 $language = array(
     "ACCEPT" => "Accept",
     "DECLINE" => "Decline",
+    "DECLINE_REASON" => "Reason for declining",
+    "SUBMIT" => "Submit",
+    "MAKE_A_SELECTION" => "Make a selection",
     "SUCCESS" => "Success",
     "FIRST_NAME" => "First name",
     "LAST_NAME" => "Last name",
