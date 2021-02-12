@@ -45,7 +45,6 @@ abstract class RegisterState {
 class mxDatabase {
 
     private $db = NULL;
-
     /**
      * Creates mxDatabase object
      * @param config object which has following members:
@@ -72,7 +71,37 @@ class mxDatabase {
         // create database file when not existent yet
         $this->db = new PDO($db_input, $user, $password);
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->db->exec("CREATE TABLE IF NOT EXISTS registrations(
+	if (strpos($db_input, 'mysql:') !== false) {
+          $this->db->exec("CREATE TABLE IF NOT EXISTS `registrations` (
+	  		`id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			`state` tinyint(4) NOT NULL DEFAULT '0',
+			`first_name` varchar(64) DEFAULT NULL,
+			`last_name` varchar(64) DEFAULT NULL,
+			`username` varchar(64) NOT NULL,
+			`password` varchar(64) NOT NULL,
+			`note` varchar(255) DEFAULT NULL,
+			`email` varchar(255) NOT NULL,
+			`verify_token` varchar(64) NOT NULL,
+			`admin_token` varchar(64) NOT NULL,
+			`request_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			PRIMARY KEY (`id`),
+			UNIQUE KEY `username` (`username`)
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4");
+          $this->db->exec("CREATE TABLE IF NOT EXISTS `logins` (
+			`id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			`active` tinyint(4) NOT NULL DEFAULT '1',
+			`first_name` varchar(64) DEFAULT NULL,
+			`last_name` varchar(64) DEFAULT NULL,
+			`localpart` varchar(64) NOT NULL,
+			`password_hash` varchar(64) DEFAULT NULL,
+			`email` varchar(64) NOT NULL,
+			`create_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			`last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			PRIMARY KEY (`id`)
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4");
+	}
+	else {
+          $this->db->exec("CREATE TABLE IF NOT EXISTS registrations(
 			id SERIAL PRIMARY KEY,
 			state INT DEFAULT 0,
 			first_name TEXT,
@@ -85,7 +114,7 @@ class mxDatabase {
 			admin_token TEXT,
 			request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 			)");
-        $this->db->exec("CREATE TABLE IF NOT EXISTS logins (
+          $this->db->exec("CREATE TABLE IF NOT EXISTS logins (
 			id SERIAL PRIMARY KEY,
 			active INT DEFAULT 1,
 			first_name TEXT,
@@ -96,6 +125,7 @@ class mxDatabase {
 			create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 			)");
+	}
         // make sure the bot is allowed to login
         if (!$this->userRegistered("register_bot")) {
             $password = $this->addUser("Register", "Bot", "register_bot", NULL, $config["register_email"]);
